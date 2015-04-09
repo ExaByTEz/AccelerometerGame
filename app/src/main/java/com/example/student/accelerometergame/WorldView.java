@@ -52,8 +52,6 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0.5f, 0.5f, false)); //Index 2: Test object
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, false)); //Index 3: Test object
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0, 0, false)); //Index 4: Immovable test object
-        //player = new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 50, 50, true, false);
-
 
         //Create the paint to render the clock
         text = new Paint();
@@ -85,30 +83,36 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                 thread.join();
                 retry = false;
             }catch(InterruptedException e){
-
+                Log.e(TAG, TAG+" ERROR: "+e.getMessage());
             }
         }
     }
 
     /**
      * Renders WorldView with all the actors onto the canvas
-     * @param canvas
+     * @param canvas - The canvas to draw the world :Canvas
      */
     public void render(Canvas canvas){
-        Log.d(TAG,"elapsed time:"+(SystemClock.elapsedRealtime()-chronometer.getBase()));
+        //Log.d(TAG,"elapsed time:"+(SystemClock.elapsedRealtime()-chronometer.getBase()));
+
         //Draw the canvas
         canvas.drawColor(Color.WHITE);
 
-        //Draw the time
+        //Draw the time using drawText(String text, float x, float y, Paint paint)
         canvas.drawText("Time: " + ((SystemClock.elapsedRealtime()-chronometer.getBase())/1000), 200, 200, text);
     }
 
+    /**
+     * Render all actors stored in the actors ArrayList
+     * @param canvas - The canvas to draw the actors on :Canvas
+     */
     public void renderActors(Canvas canvas){
         if(!actors.isEmpty()){
             for(Actor actor : actors){ //Iterate through all actors
                 if(actor.getAccelerometerScaleX() > actor.MIN_SCALE || actor.getAccelerometerScaleY() > actor.MIN_SCALE){ //Move the actor if it uses the accelerometer
                     actor.translate(-main.getAccelX()*actor.getAccelerometerScaleX(), main.getAccelY()*actor.getAccelerometerScaleY());
                 }
+
                 actor.draw(canvas); //Draw the actor on the canvas
             }
         }
