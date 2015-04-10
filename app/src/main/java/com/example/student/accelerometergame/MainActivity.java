@@ -16,7 +16,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private SensorManager sm;
     private Sensor sen;
     private long lastUpdate;
-    private static final int SHAKE_THRESHOLD = 500;
+    //private static final int SHAKE_THRESHOLD = 500;
     private float x;
     private float y;
     public MainActivity(){
@@ -27,16 +27,16 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(new WorldView(this,this));
-
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(new WorldView(this, this));
+
 
         //Setup the sensor manager and the sensor used for the accelerometer
         sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sen = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         //Setup the listener for the sensor manager
-        sm.registerListener(this, sen, sm.SENSOR_DELAY_NORMAL); //registerListener(Context, Sensor, Rate)
+        sm.registerListener(this, sen, SensorManager.SENSOR_DELAY_NORMAL); //registerListener(Context, Sensor, Rate)
 
     }
 
@@ -51,7 +51,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onResume() {
         super.onResume();
         //Start sensor when onResume is called
-        sm.registerListener(this, sen, sm.SENSOR_DELAY_NORMAL);
+        sm.registerListener(this, sen, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             //Only get the data after every few milliseconds instead of always constantly
             long curTime = System.currentTimeMillis();
             if((curTime - lastUpdate) > 100){
-                long diffTime = curTime-lastUpdate;
+                //long diffTime = curTime-lastUpdate;
                 lastUpdate = curTime;
                 this.x = x;
                 this.y = y;
