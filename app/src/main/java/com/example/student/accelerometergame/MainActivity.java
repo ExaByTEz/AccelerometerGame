@@ -16,6 +16,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private SensorManager sm;
     private Sensor sen;
     private long lastUpdate;
+    private WorldView worldView;
     //private static final int SHAKE_THRESHOLD = 500;
     private float x;
     private float y;
@@ -28,7 +29,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(new WorldView(this, this));
+        worldView=new WorldView(this, this);
+        setContentView(worldView);
 
 
         //Setup the sensor manager and the sensor used for the accelerometer
@@ -43,13 +45,27 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     protected void onPause() {
         super.onPause();
+        worldView.changeThreadState(false);
         //Stop sensor when onPause is called
         sm.unregisterListener(this);
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        worldView.changeThreadState(false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        worldView.changeThreadState(false);
+        super.onDestroy();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        worldView.changeThreadState(true);
         //Start sensor when onResume is called
         sm.registerListener(this, sen, SensorManager.SENSOR_DELAY_NORMAL);
     }

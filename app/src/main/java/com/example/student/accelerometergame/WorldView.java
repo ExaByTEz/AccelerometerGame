@@ -67,8 +67,15 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
     }
 
+    public void changeThreadState(boolean running){
+        thread.setRunning(running);
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        if(thread.getState()==Thread.State.TERMINATED){
+            thread = new WorldViewThread(this);
+        }
         thread.setRunning(true);
         thread.start();
     }
