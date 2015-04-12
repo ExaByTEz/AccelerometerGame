@@ -1,74 +1,107 @@
 package com.example.student.accelerometergame;
 
-import android.util.Log;
-import android.widget.ImageView;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 
 /**
  * Accelerometer Game
  *
- * @author Dean Vang
+ * @author Dean Vang, Eric Bonsness
  *         4/3/2015
  */
+
+
+@SuppressWarnings("UnusedDeclaration")
 public class GameObject {
+    private Bitmap bitmap;
     private boolean solid;
-    private float[] hitBox;
-    private ImageView view;
-    private boolean useAccelerometer;
-    private boolean isHostile;
+    private float x;
+    private float y;
 
     public GameObject(){}
-
-    public GameObject(ImageView view, boolean useAccelerometer, boolean solid){
+    public GameObject(Bitmap bitmap, float x, float y, boolean solid){
+        this.bitmap = bitmap;
+        this.x = x;
+        this.y = y;
         this.solid = solid;
-        this.view = view;
-        this.useAccelerometer = useAccelerometer;
     }
 
-    public GameObject(ImageView view, int imgId, boolean useAccelerometer, boolean solid){
-        this.solid = solid;
-        this.view = view;
-        this.useAccelerometer = useAccelerometer;
-
-        view.setImageResource(imgId);
-        view.setScaleType(ImageView.ScaleType.CENTER);
+    /**
+     * Get the bitmap resource
+     * @return The bitmap resource :Bitmap
+     */
+    public Bitmap getBitmap(){
+        return bitmap;
     }
 
-    public final void setCoordinates(ImageView view, float x, float y){
-        view.setX(x);
-        view.setY(y);
+    /**
+     * Set the image to draw
+     * @param bitmap - The bitmap resource :Bitmap
+     */
+    public void setBitmap(Bitmap bitmap){
+        this.bitmap = bitmap;
     }
 
-    public final boolean getSolid(){
+    /**
+     * Get the x coordinate
+     * @return The x coordinate :float
+     */
+    public float getX(){
+        return x;
+    }
+
+    /**
+     * Set the x coordinate
+     * @param x - Value to set x coordinate :float
+     */
+    public void setX(float x){
+        this.x = x;
+    }
+
+    /**
+     * Get the y coordinate
+     * @return The y coordinate :float
+     */
+    public float getY(){
+        return y;
+    }
+
+    /**
+     * Set the y coordinate
+     * @param y - Value to set y coordinate :float
+     */
+    public void setY(float y){
+        this.y = y;
+    }
+
+    /**
+     * Translate the actor by a set value
+     * @param x - Value to add to x coordinate :float
+     * @param y - Value to add to y coordinate :float
+     */
+    public void translate(float x, float y){
+        this.x += x;
+        this.y += y;
+    }
+
+    /**
+     * Draw the actor on the given canvas
+     * @param canvas - The canvas to draw the actor on
+     */
+    public void draw(Canvas canvas){
+        canvas.drawBitmap(bitmap, x - (bitmap.getWidth() / 2), y - (bitmap.getHeight() / 2), null);
+    }
+
+    public boolean isSolid(){
         return solid;
     }
 
-    public final ImageView getView(){
-        return view;
-    }
-
-    public final boolean getUseAccelerometer(){
-        return useAccelerometer;
-    }
-
-    public final float[] getHitBox(){
-        return hitBox;
-    }
-
-    public boolean validPosition(){
+    public boolean isValidPosition(){
         return true;
     }
 
-    public float[] fixPosition(){
-        return null;
-    }
 
-    public void move(float x, float y){
-        view.setX(view.getX()+x);
-        view.setY(view.getY()+y);
-        //Log.d("Accel Objects", "pos(x,y): (" + view.getX() + "," + view.getY() + ")");
-    }
-
-    public void remove(){
+    public void destroyGameObject(){
 
     }
 

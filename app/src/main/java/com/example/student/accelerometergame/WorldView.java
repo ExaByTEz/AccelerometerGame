@@ -16,14 +16,13 @@ import java.util.ArrayList;
 /**
  * Accelerometer Game
  *
- * @author Dean Vang
+ * @author Dean Vang, Eric Bonsness
  *         4/6/2015
  */
 public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private final String TAG = this.getClass().getSimpleName();
 
     private WorldViewThread thread;
-    private Actor player;
     private ArrayList<Actor> actors;
     private MainActivity main;
     private Chronometer chronometer;
@@ -35,7 +34,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         this.main = main;
 
         //Initialize ArrayList of actors
-        actors = new ArrayList<Actor>();
+        actors = new ArrayList<>();
 
         //Create the simple timer using a chronometer
         chronometer = new Chronometer(context);
@@ -48,10 +47,12 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
         //Create player and/or other actors
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 50, 50, 1, 1, false)); //Index 0: Player
+        /* //Test Objects
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 150, 150, 0.2f,0, false)); //Index 1: Test object
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0.5f, 0.5f, false)); //Index 2: Test object
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, false)); //Index 3: Test object
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0, 0, false)); //Index 4: Immovable test object
+        */
 
         //Create the paint to render the clock
         text = new Paint();

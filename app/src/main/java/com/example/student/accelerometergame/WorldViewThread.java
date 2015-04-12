@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 /**
  * Accelerometer Game
  *
- * @author Dean Vang
+ * @author Dean Vang, Eric Bonsness
  *         4/6/2015
  */
 public class WorldViewThread extends Thread {
