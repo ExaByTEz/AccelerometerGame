@@ -9,22 +9,22 @@ import android.widget.ImageView;
  * @author Dean Vang
  *         4/3/2015
  */
-public class Objects {
+public class GameObject {
     private boolean solid;
     private float[] hitBox;
     private ImageView view;
     private boolean useAccelerometer;
     private boolean isHostile;
 
-    public Objects(){}
+    public GameObject(){}
 
-    public Objects(ImageView view, boolean useAccelerometer, boolean solid){
+    public GameObject(ImageView view, boolean useAccelerometer, boolean solid){
         this.solid = solid;
         this.view = view;
         this.useAccelerometer = useAccelerometer;
     }
 
-    public Objects(ImageView view, int imgId, boolean useAccelerometer, boolean solid){
+    public GameObject(ImageView view, int imgId, boolean useAccelerometer, boolean solid){
         this.solid = solid;
         this.view = view;
         this.useAccelerometer = useAccelerometer;

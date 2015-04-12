@@ -9,7 +9,7 @@ import android.graphics.Canvas;
  * @author Dean Vang
  *         4/3/2015
  */
-public class Actor extends Objects{
+public class Actor extends GameObject {
 
     public final float MIN_SCALE = 0.01f;
     private Bitmap bitmap;
