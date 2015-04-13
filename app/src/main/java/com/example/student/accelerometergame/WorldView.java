@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -24,14 +26,22 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
     private WorldViewThread thread;
     private ArrayList<Actor> actors;
+    private ArrayList<Obstacle> obstacles;
     private MainActivity main;
     private Chronometer chronometer;
     private Paint text;
+    //private float widthDP;
+    //private float heightDP;
+    private float scale;
 
 
-    public WorldView(Context context, MainActivity main){
+    public WorldView(Context context, MainActivity main, float scale){
         super(context);
         this.main = main;
+
+        this.scale=scale;
+        //widthDP=widthX;
+        //heightDP=heightY;
 
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
@@ -46,13 +56,14 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         getHolder().addCallback(this);
 
         //Create player and/or other actors
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 50, 50, 1, 1, false)); //Index 0: Player
+        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 50, 50, 1, 1, true, scale)); //Index 0: Player
         /* //Test Objects
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 150, 150, 0.2f,0, false)); //Index 1: Test object
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0.5f, 0.5f, false)); //Index 2: Test object
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, false)); //Index 3: Test object
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0, 0, false)); //Index 4: Immovable test object
+        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 150, 150, 0.2f,0, true, scale)); //Index 1: Test object
+        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0.5f, 0.5f, true, scale)); //Index 2: Test object
+        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, true, scale)); //Index 3: Test object
         */
+        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0, 0, true, scale)); //Index 4: Test object unaffected by accelerometer
+
 
         //Create the paint to render the clock
         text = new Paint();
@@ -116,12 +127,22 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
      */
     public void renderActors(Canvas canvas){
         if(!actors.isEmpty()){
-            for(Actor actor : actors){ //Iterate through all actors
-                if(actor.getAccelerometerScaleX() > actor.MIN_SCALE || actor.getAccelerometerScaleY() > actor.MIN_SCALE){ //Move the actor if it uses the accelerometer
-                    actor.translate(-main.getAccelX()*actor.getAccelerometerScaleX(), main.getAccelY()*actor.getAccelerometerScaleY());
-                }
+            for(int i=0;i<actors.size();i++){ //Iterate through all actors
+                if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_SCALE){ //Move the actor if it uses the accelerometer
+                    Float oldX=-main.getAccelX()*actors.get(i).getAccelerometerScaleX();
+                    Float oldY=main.getAccelY()*actors.get(i).getAccelerometerScaleY();
 
-                actor.draw(canvas); //Draw the actor on the canvas
+                    actors.get(i).translate(-main.getAccelX()*actors.get(i).getAccelerometerScaleX(), main.getAccelY()*actors.get(i).getAccelerometerScaleY());
+                    //only check against those that didn't
+                        for (int j = i + 1; j < actors.size(); j++) {
+                            if (actors.get(i).isIntersecting(actors.get(j))) {
+                                actors.get(i).translate(-oldX,-oldY);//for now, just stop them
+                                Log.d("Collision","Collision Successful");
+                                break;
+                            }
+                        }
+                }
+                actors.get(i).draw(canvas); //Draw the actor on the canvas
             }
         }
     }

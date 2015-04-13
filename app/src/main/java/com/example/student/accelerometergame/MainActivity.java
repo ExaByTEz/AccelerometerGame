@@ -1,11 +1,14 @@
 package com.example.student.accelerometergame;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.Activity;
@@ -29,7 +32,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        worldView=new WorldView(this, this);
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        worldView=new WorldView(this, this, displayMetrics.density);
         setContentView(worldView);
 
 

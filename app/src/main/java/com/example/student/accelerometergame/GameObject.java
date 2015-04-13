@@ -2,6 +2,10 @@ package com.example.student.accelerometergame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 
 /**
  * Accelerometer Game
@@ -15,15 +19,29 @@ import android.graphics.Canvas;
 public class GameObject {
     private Bitmap bitmap;
     private boolean solid;
-    private float x;
-    private float y;
+    private RectF hitBox;
+    private float scale;
 
     public GameObject(){}
-    public GameObject(Bitmap bitmap, float x, float y, boolean solid){
-        this.bitmap = bitmap;
-        this.x = x;
-        this.y = y;
+    public GameObject(Bitmap bitmap, float x, float y, boolean solid, float scale){
+        //localImage.setWidth((int) (localImage.getWidth()*scale+.5f));
+
+        x=x*scale;
+        y = y*scale;
+
+        this.bitmap = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*scale),(int)(bitmap.getHeight()*scale),false);
+
+        hitBox=new RectF((x - (this.bitmap.getWidth() / 2)),(y - (this.bitmap.getHeight() / 2)),(x + (this.bitmap.getWidth() / 2)),(y + (this.bitmap.getHeight() / 2)));
+
+
+
+        /*
+        this.x=x;
+        this.y=y;
+        this.bitmap=bitmap;
+        */
         this.solid = solid;
+        this.scale=scale;
     }
 
     /**
@@ -39,7 +57,7 @@ public class GameObject {
      * @param bitmap - The bitmap resource :Bitmap
      */
     public void setBitmap(Bitmap bitmap){
-        this.bitmap = bitmap;
+        this.bitmap = Bitmap.createScaledBitmap(bitmap,(int)hitBox.left,(int)hitBox.top,false);
     }
 
     /**
@@ -47,7 +65,7 @@ public class GameObject {
      * @return The x coordinate :float
      */
     public float getX(){
-        return x;
+        return hitBox.centerX();
     }
 
     /**
@@ -55,7 +73,8 @@ public class GameObject {
      * @param x - Value to set x coordinate :float
      */
     public void setX(float x){
-        this.x = x;
+        hitBox.offsetTo(x*scale,hitBox.top);
+        //this.x=x;
     }
 
     /**
@@ -63,7 +82,7 @@ public class GameObject {
      * @return The y coordinate :float
      */
     public float getY(){
-        return y;
+        return hitBox.centerY();
     }
 
     /**
@@ -71,7 +90,8 @@ public class GameObject {
      * @param y - Value to set y coordinate :float
      */
     public void setY(float y){
-        this.y = y;
+        hitBox.offsetTo(hitBox.left,y*scale);
+        //this.y=y;
     }
 
     /**
@@ -80,8 +100,7 @@ public class GameObject {
      * @param y - Value to add to y coordinate :float
      */
     public void translate(float x, float y){
-        this.x += x;
-        this.y += y;
+        hitBox.offset(x * scale, y * scale);
     }
 
     /**
@@ -89,17 +108,33 @@ public class GameObject {
      * @param canvas - The canvas to draw the actor on
      */
     public void draw(Canvas canvas){
-        canvas.drawBitmap(bitmap, x - (bitmap.getWidth() / 2), y - (bitmap.getHeight() / 2), null);
+        canvas.drawBitmap(bitmap, hitBox.left, hitBox.top, null);
+        /*
+        Paint testing=new Paint();//draw a blue bounding box where the bitmap should be
+        testing.setColor(Color.BLUE);
+        testing.setStrokeWidth(2);
+        canvas.drawRect(hitBox,testing);
+        */
     }
 
     public boolean isSolid(){
         return solid;
     }
 
+    public RectF getHitBox(){ return hitBox;}
+
+    public void setHitBox(RectF hitBox){this.hitBox=hitBox;}
+
     public boolean isValidPosition(){
         return true;
     }
 
+    public boolean isIntersecting(GameObject other){//also checks if one contains the other
+        if(other.isSolid()&&this.solid){
+            return RectF.intersects(other.getHitBox(),this.hitBox);//|| hitBox.contains(other.getHitBox())||other.getHitBox().contains(this.hitBox)
+        }
+        return false;
+    }
 
     public void destroyGameObject(){
 
