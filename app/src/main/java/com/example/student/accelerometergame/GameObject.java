@@ -2,6 +2,8 @@ package com.example.student.accelerometergame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.Log;
 
@@ -41,7 +43,7 @@ public class GameObject {
 
         this.bitmap = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*bitmapScale),(int)(bitmap.getHeight()*bitmapScale),false);
         //hitBox = new RectF(float left, float top, float right, float bottom)
-        hitBox = new RectF(x,y, x+(bitmap.getWidth()/2),y+(bitmap.getHeight()/2));//new RectF((x - (bitmap.getWidth() / 2)),bitmap.getHeight(), bitmap.getWidth(),(y - (bitmap.getHeight() / 2)));
+        hitBox = new RectF(x,y, x+(this.bitmap.getWidth()),y+(this.bitmap.getHeight()));//new RectF((x - (bitmap.getWidth() / 2)),bitmap.getHeight(), bitmap.getWidth(),(y - (bitmap.getHeight() / 2)));
     }
 
     /**
@@ -66,7 +68,7 @@ public class GameObject {
      * @return The center x coordinate :float
      */
     public float getX(){
-        return hitBox.centerX();
+        return hitBox.left;
     }
 
     /**
@@ -83,7 +85,7 @@ public class GameObject {
      * @return The center y coordinate :float
      */
     public float getY(){
-        return hitBox.centerY();
+        return hitBox.top;
     }
 
     /**
@@ -110,12 +112,12 @@ public class GameObject {
      */
     public void draw(Canvas canvas){
         canvas.drawBitmap(bitmap, hitBox.left, hitBox.top, null);
-        /*
+
         Paint testing=new Paint();//draw a blue bounding box where the bitmap should be
         testing.setColor(Color.BLUE);
         testing.setStrokeWidth(2);
         canvas.drawRect(hitBox,testing);
-        */
+
     }
 
     public boolean isSolid(){
