@@ -13,7 +13,7 @@ import android.graphics.Canvas;
 @SuppressWarnings("UnusedDeclaration")
 public class Actor extends GameObject {
 
-    public final float MIN_SCALE = 0.01f;
+    public final float MIN_ACCEL_SCALE = 0.01f;
     private Bitmap bitmap;
 
     private float accelerometerScaleX;

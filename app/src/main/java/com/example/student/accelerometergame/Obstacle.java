@@ -1,5 +1,7 @@
 package com.example.student.accelerometergame;
 
+import android.graphics.Bitmap;
+
 /**
  * Accelerometer Game
  *
@@ -9,5 +11,7 @@ package com.example.student.accelerometergame;
 
 @SuppressWarnings("UnusedDeclaration")
 public class Obstacle extends GameObject{
-
+    public Obstacle(Bitmap bitmap, float x, float y, boolean solid, float bitmapScale){
+        super(bitmap,x,y,solid,bitmapScale);
+    }
 }

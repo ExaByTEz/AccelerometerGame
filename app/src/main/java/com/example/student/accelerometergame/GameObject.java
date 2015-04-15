@@ -2,10 +2,8 @@ package com.example.student.accelerometergame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 /**
  * Accelerometer Game
@@ -20,28 +18,30 @@ public class GameObject {
     private Bitmap bitmap;
     private boolean solid;
     private RectF hitBox;
-    private float scale;
+    private float bitmapScale;
 
     public GameObject(){}
-    public GameObject(Bitmap bitmap, float x, float y, boolean solid, float scale){
-        //localImage.setWidth((int) (localImage.getWidth()*scale+.5f));
 
-        x=x*scale;
-        y = y*scale;
+    /**
+     *
+     * @param bitmap - Bitmap of the GameObject :Bitmap
+     * @param x - Left x coordinate to place the bitmap :float
+     * @param y - Left y coordinate to place the bitmap :float
+     * @param solid - Should the GameObject be treated as a solid :boolean
+     * @param bitmapScale - Scale to draw the bitmap :float
+     */
+    public GameObject(Bitmap bitmap, float x, float y, boolean solid, float bitmapScale){
+        //localImage.setWidth((int) (localImage.getWidth()*bitmapScale+.5f));
 
-        this.bitmap = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*scale),(int)(bitmap.getHeight()*scale),false);
+        //x = x*bitmapScale;
+        //y = y*bitmapScale;
 
-        hitBox=new RectF((x - (this.bitmap.getWidth() / 2)),(y - (this.bitmap.getHeight() / 2)),(x + (this.bitmap.getWidth() / 2)),(y + (this.bitmap.getHeight() / 2)));
-
-
-
-        /*
-        this.x=x;
-        this.y=y;
-        this.bitmap=bitmap;
-        */
         this.solid = solid;
-        this.scale=scale;
+        this.bitmapScale = bitmapScale;
+
+        this.bitmap = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*bitmapScale),(int)(bitmap.getHeight()*bitmapScale),false);
+        //hitBox = new RectF(float left, float top, float right, float bottom)
+        hitBox = new RectF(x,y, x+(bitmap.getWidth()/2),y+(bitmap.getHeight()/2));//new RectF((x - (bitmap.getWidth() / 2)),bitmap.getHeight(), bitmap.getWidth(),(y - (bitmap.getHeight() / 2)));
     }
 
     /**
@@ -57,12 +57,13 @@ public class GameObject {
      * @param bitmap - The bitmap resource :Bitmap
      */
     public void setBitmap(Bitmap bitmap){
-        this.bitmap = Bitmap.createScaledBitmap(bitmap,(int)hitBox.left,(int)hitBox.top,false);
+        this.bitmap = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*bitmapScale),(int)(bitmap.getHeight()*bitmapScale),false);
+        //TODO:Update hitBox to scale to new bitmap
     }
 
     /**
-     * Get the x coordinate
-     * @return The x coordinate :float
+     * Get the center x coordinate
+     * @return The center x coordinate :float
      */
     public float getX(){
         return hitBox.centerX();
@@ -73,13 +74,13 @@ public class GameObject {
      * @param x - Value to set x coordinate :float
      */
     public void setX(float x){
-        hitBox.offsetTo(x*scale,hitBox.top);
+        hitBox.offsetTo(x,hitBox.top);
         //this.x=x;
     }
 
     /**
-     * Get the y coordinate
-     * @return The y coordinate :float
+     * Get the center y coordinate
+     * @return The center y coordinate :float
      */
     public float getY(){
         return hitBox.centerY();
@@ -90,7 +91,7 @@ public class GameObject {
      * @param y - Value to set y coordinate :float
      */
     public void setY(float y){
-        hitBox.offsetTo(hitBox.left,y*scale);
+        hitBox.offsetTo(hitBox.left,y);
         //this.y=y;
     }
 
@@ -100,7 +101,7 @@ public class GameObject {
      * @param y - Value to add to y coordinate :float
      */
     public void translate(float x, float y){
-        hitBox.offset(x * scale, y * scale);
+        hitBox.offset(x, y);
     }
 
     /**
