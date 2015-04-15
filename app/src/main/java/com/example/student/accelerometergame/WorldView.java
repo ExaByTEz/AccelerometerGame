@@ -130,20 +130,21 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                 if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
                     float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();
                     float oldY = main.getAccelY()*actors.get(i).getAccelerometerScaleY();
-                    boolean collision = false;
+                    //boolean collision = false;
+
+                    //we need to translate first. this ensure the next movement is tested instead of the current, allowing oldX and oldY to properly move the object back in time, instead of moving it a new direction
+                    //the old way created the bug allowing you to tilt the accelerometer before draw allowing the ball to phase through solids
+                    actors.get(i).translate(-main.getAccelX()*actors.get(i).getAccelerometerScaleX(), main.getAccelY()*actors.get(i).getAccelerometerScaleY());
 
                     //only check against those that didn't TODO:Needs to change (if we have time).  Nested loops = Bad For Performance
                     for (int j = i + 1; j < actors.size(); j++) {
                         if (actors.get(i).isIntersecting(actors.get(j))) {
                             //actors.get(i).translate(-oldX,-oldY);//for now, just stop them
-                            collision = true;
+                            //collision = true;
                             Log.d("Collision", "Collision Successful");
                             actors.get(i).translate(-oldX,-oldY);
                             break;
                         }
-                    }
-                    if(!collision){
-                        actors.get(i).translate(-main.getAccelX()*actors.get(i).getAccelerometerScaleX(), main.getAccelY()*actors.get(i).getAccelerometerScaleY());
                     }
                 }
                 actors.get(i).draw(canvas); //Draw the actor on the canvas
