@@ -5,8 +5,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Region;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.Shape;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Chronometer;
@@ -25,6 +33,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private WorldViewThread thread;
     private ArrayList<Actor> actors;
     private ArrayList<Obstacle> obstacles;
+    private ArrayList<Region> walls;
+    private ArrayList<Obstacle> constantObstacles;
     private MainActivity main;
     private Chronometer chronometer;
     private Paint text;
@@ -33,7 +43,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private float bitmapScale;
 
 
-    public WorldView(Context context, MainActivity main, float bitmapScale){
+    public WorldView(Context context, MainActivity main, float bitmapScale,int screenWidth, int screenHeight){
         super(context);
         this.main = main;
 
@@ -44,6 +54,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
         obstacles = new ArrayList<>();
+        walls=new ArrayList<>();
+        constantObstacles=new ArrayList<>();
 
         //Create the simple timer using a chronometer
         chronometer = new Chronometer(context);
@@ -63,6 +75,35 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         */
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0, 0, true, bitmapScale)); //Index 4: Test object unaffected by accelerometer
         obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,300,true, bitmapScale));
+        constantObstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.wall),450,300,true, bitmapScale));
+        constantObstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.wall),450,304,true, bitmapScale));
+
+        //put path array back here
+        Path wallPath=new Path();
+        RectF pathBounds=new RectF();
+        int increment=0;
+
+        if(constantObstacles.size()>0) {
+            wallPath.addRect(constantObstacles.get(0).getHitBox(), Path.Direction.CCW);
+
+            for (int i=1;i<constantObstacles.size();i++) {
+                wallPath.computeBounds(pathBounds,true);
+               if ((constantObstacles.get(i).getHitBox().left==pathBounds.left&&constantObstacles.get(i).getHitBox().right==pathBounds.right)||(constantObstacles.get(i).getHitBox().top==pathBounds.top&&constantObstacles.get(i).getHitBox().bottom==pathBounds.bottom)) {
+                    wallPath.addRect(constantObstacles.get(i).getHitBox(),Path.Direction.CCW);
+                }
+                else{
+                   walls.add(new Region());
+                   walls.get(increment).setPath(wallPath,new Region(0,0,screenWidth,screenHeight));
+                   wallPath.reset();
+                   wallPath.addRect(constantObstacles.get(i).getHitBox(),Path.Direction.CCW);
+                   increment++;
+               }
+                if(i==constantObstacles.size()-1){//we reached the end, add the last region no matter what
+                    walls.add(new Region());
+                    walls.get(increment).setPath(wallPath,new Region(0,0,screenWidth,screenHeight));
+                }
+            }
+        }
 
         //Create the paint to render the clock
         text = new Paint();
@@ -127,23 +168,36 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     public void renderActors(Canvas canvas){
         if(!actors.isEmpty()){
             for(int i=0;i<actors.size();i++){ //Iterate through all actors
-                if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
-                    float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();
-                    float oldY = main.getAccelY()*actors.get(i).getAccelerometerScaleY();
-                    //boolean collision = false;
+                if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE) { //Move the actor if it uses the accelerometer
+                    float oldX = -main.getAccelX() * actors.get(i).getAccelerometerScaleX();
+                    float oldY = main.getAccelY() * actors.get(i).getAccelerometerScaleY();
+                    boolean collision = false;
 
                     //we need to translate first. this ensure the next movement is tested instead of the current, allowing oldX and oldY to properly move the object back in time, instead of moving it a new direction
                     //the old way created the bug allowing you to tilt the accelerometer before draw allowing the ball to phase through solids
-                    actors.get(i).translate(-main.getAccelX()*actors.get(i).getAccelerometerScaleX(), main.getAccelY()*actors.get(i).getAccelerometerScaleY());
+                    actors.get(i).translate(-main.getAccelX() * actors.get(i).getAccelerometerScaleX(), main.getAccelY() * actors.get(i).getAccelerometerScaleY());
 
                     //only check against those that didn't TODO:Needs to change (if we have time).  Nested loops = Bad For Performance
-                    for (int j = i + 1; j < actors.size(); j++) {
-                        if (actors.get(i).isIntersecting(actors.get(j))) {
-                            //actors.get(i).translate(-oldX,-oldY);//for now, just stop them
-                            //collision = true;
-                            Log.d("Collision", "Collision Successful");
-                            actors.get(i).translate(-oldX,-oldY);
+                    Rect roundedHitBox=new Rect();
+                    actors.get(i).getHitBox().round(roundedHitBox);
+                    for(Region wall:walls){
+                        if(!wall.quickReject(roundedHitBox)){
+                            collision=true;
                             break;
+                        }
+                    }
+                    if (collision) {//walls.get(0).quickReject(roundedHitBox)
+                        Log.d("Collision", "Collision Successful with Complex Region");
+                        actors.get(i).translate(-oldX, -oldY);
+                    } else {
+                        for (int j = i + 1; j < actors.size(); j++) {
+                            if (actors.get(i).isIntersecting(actors.get(j))) {
+                                //actors.get(i).translate(-oldX,-oldY);//for now, just stop them
+                                //collision = true;
+                                Log.d("Collision", "Collision Successful with Actor");
+                                actors.get(i).translate(-oldX, -oldY);
+                                break;
+                            }
                         }
                     }
                 }
@@ -153,6 +207,15 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         if(!obstacles.isEmpty()){
             for(Obstacle obstacle : obstacles){
                 obstacle.draw(canvas);
+            }
+        }
+        if(!walls.isEmpty()){//sanity check to be removed, simply highlights all regions so we can see their bounding boxes
+            for(Region condensedWalls:walls){
+                Paint testing=new Paint();//draw a green bounding box where the path/region should exist
+                testing.setColor(Color.GREEN);
+                testing.setStrokeWidth(2);
+                testing.setAlpha(25);
+                canvas.drawPath(condensedWalls.getBoundaryPath(),testing);
             }
         }
     }

@@ -33,7 +33,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-        worldView=new WorldView(this, this, displayMetrics.density);
+
+        worldView=new WorldView(this, this, displayMetrics.density,displayMetrics.widthPixels,displayMetrics.heightPixels);
         setContentView(worldView);
 
 
