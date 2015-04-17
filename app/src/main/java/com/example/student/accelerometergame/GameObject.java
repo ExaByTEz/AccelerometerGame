@@ -115,6 +115,7 @@ public class GameObject {
 
         Paint testing=new Paint();//draw a blue bounding box where the bitmap should be
         testing.setColor(Color.BLUE);
+        testing.setAlpha(25);
         testing.setStrokeWidth(2);
         canvas.drawRect(hitBox,testing);
 

@@ -6,7 +6,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Chronometer;
@@ -33,14 +35,18 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private float bitmapScale;
 
 
-    public WorldView(Context context, MainActivity main, float bitmapScale){
+    public WorldView(Context context, MainActivity main, Display display){
         super(context);
         this.main = main;
 
-        this.bitmapScale = bitmapScale;
-        //widthDP=widthX;
-        //heightDP=heightY;
+        Log.d("Display", "density="+getResources().getDisplayMetrics().density);
+        this.bitmapScale = getResources().getDisplayMetrics().density;
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        display.getMetrics(displayMetrics);
+        float dpWidth=displayMetrics.widthPixels;
+        float dpHeight=displayMetrics.heightPixels;
 
+        Log.d("Display", "dpWidth="+dpWidth + " dpHeight="+dpHeight);
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
         obstacles = new ArrayList<>();
@@ -62,7 +68,9 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, true, bitmapScale)); //Index 3: Test object
         */
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0, 0, true, bitmapScale)); //Index 4: Test object unaffected by accelerometer
-        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,300,true, bitmapScale));
+        //Zones need to be solid to detect collision for now
+        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,300,true, bitmapScale, Obstacle.ObstacleType.END_ZONE));
+        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,600,true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
 
         //Create the paint to render the clock
         text = new Paint();
@@ -131,7 +139,11 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();
                     float oldY = main.getAccelY()*actors.get(i).getAccelerometerScaleY();
                     //boolean collision = false;
-
+                    /*
+                    if(i==0){
+                        Log.d("Actor 0", "(left, top, right, bottom)=("+actors.get(i).getHitBox().left+","+actors.get(i).getHitBox().top+","+actors.get(i).getHitBox().right+","+actors.get(i).getHitBox().bottom+")");
+                    }
+                    */
                     //we need to translate first. this ensure the next movement is tested instead of the current, allowing oldX and oldY to properly move the object back in time, instead of moving it a new direction
                     //the old way created the bug allowing you to tilt the accelerometer before draw allowing the ball to phase through solids
                     actors.get(i).translate(-main.getAccelX()*actors.get(i).getAccelerometerScaleX(), main.getAccelY()*actors.get(i).getAccelerometerScaleY());
@@ -152,6 +164,10 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         }
         if(!obstacles.isEmpty()){
             for(Obstacle obstacle : obstacles){
+                //Log.d("Obstacle", "Zone Type:" + obstacle.getObstacleType());
+                if(actors.get(0).isIntersecting(obstacle)){
+                    Log.d("Obstacle", "Player is inside of " + obstacle.getObstacleType());
+                }
                 obstacle.draw(canvas);
             }
         }

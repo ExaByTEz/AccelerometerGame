@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,8 +33,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-        worldView=new WorldView(this, this, displayMetrics.density);
+        worldView=new WorldView(this, this, getWindowManager().getDefaultDisplay());
         setContentView(worldView);
 
 
