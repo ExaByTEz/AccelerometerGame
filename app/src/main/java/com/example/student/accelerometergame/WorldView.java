@@ -5,16 +5,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Region;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.Shape;
 import android.os.SystemClock;
 import android.util.Log;
-import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Chronometer;
@@ -43,13 +35,16 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private float bitmapScale;
 
 
-    public WorldView(Context context, MainActivity main, float bitmapScale,int screenWidth, int screenHeight){
+    public WorldView(Context context, MainActivity main, Display display){
         super(context);
         this.main = main;
 
-        this.bitmapScale = bitmapScale;
-        //widthDP=widthX;
-        //heightDP=heightY;
+        Log.d("Display", "density="+getResources().getDisplayMetrics().density);
+        this.bitmapScale = getResources().getDisplayMetrics().density;
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        display.getMetrics(displayMetrics);
+        float dpWidth=displayMetrics.widthPixels;
+        float dpHeight=displayMetrics.heightPixels;
 
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
@@ -77,6 +72,9 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,300,true, bitmapScale));
         constantObstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.wall),450,300,true, bitmapScale));
         constantObstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.wall),450,304,true, bitmapScale));
+        //Zones need to be solid to detect collision for now
+        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,300,true, bitmapScale, Obstacle.ObstacleType.END_ZONE));
+        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,600,true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
 
         //put path array back here
         Path wallPath=new Path();
@@ -168,10 +166,10 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     public void renderActors(Canvas canvas){
         if(!actors.isEmpty()){
             for(int i=0;i<actors.size();i++){ //Iterate through all actors
-                if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE) { //Move the actor if it uses the accelerometer
-                    float oldX = -main.getAccelX() * actors.get(i).getAccelerometerScaleX();
-                    float oldY = main.getAccelY() * actors.get(i).getAccelerometerScaleY();
-                    boolean collision = false;
+                if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
+                    float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();
+                    float oldY = main.getAccelY()*actors.get(i).getAccelerometerScaleY();
+                    //boolean collision = false;
 
                     //we need to translate first. this ensure the next movement is tested instead of the current, allowing oldX and oldY to properly move the object back in time, instead of moving it a new direction
                     //the old way created the bug allowing you to tilt the accelerometer before draw allowing the ball to phase through solids
@@ -206,6 +204,10 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         }
         if(!obstacles.isEmpty()){
             for(Obstacle obstacle : obstacles){
+                //Log.d("Obstacle", "Zone Type:" + obstacle.getObstacleType());
+                if(actors.get(0).isIntersecting(obstacle)){
+                    Log.d("Obstacle", "Player is inside of " + obstacle.getObstacleType());
+                }
                 obstacle.draw(canvas);
             }
         }
