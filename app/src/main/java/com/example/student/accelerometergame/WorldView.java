@@ -216,6 +216,11 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                 obstacle.draw(canvas);
             }
         }
+        if(!constantObstacles.isEmpty()){
+            for(Obstacle constant:constantObstacles){
+                constant.draw(canvas);
+            }
+        }
         if(!walls.isEmpty()){//sanity check to be removed, simply highlights all regions so we can see their bounding boxes
             for(Region condensedWalls:walls){
                 Paint testing=new Paint();//draw a green bounding box where the path/region should exist
