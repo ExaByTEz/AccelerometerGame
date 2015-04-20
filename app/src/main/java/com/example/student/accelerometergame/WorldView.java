@@ -31,7 +31,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private WorldViewThread thread;
     private ArrayList<Actor> actors;
     private ArrayList<Obstacle> obstacles;
-    private ArrayList<Region> walls;
+    private ArrayList<RectF> walls;
     private ArrayList<Obstacle> constantObstacles;
     private MainActivity main;
     private Chronometer chronometer;
@@ -82,28 +82,21 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,600,true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
 
         //put path array back here
-        Path wallPath=new Path();
-        RectF pathBounds=new RectF();
-        int increment=0;
+        RectF currentWall=new RectF();
 
         if(constantObstacles.size()>0) {
-            wallPath.addRect(constantObstacles.get(0).getHitBox(), Path.Direction.CCW);
+            currentWall.set(constantObstacles.get(0).getHitBox());
 
             for (int i=1;i<constantObstacles.size();i++) {
-                wallPath.computeBounds(pathBounds,true);
-               if ((constantObstacles.get(i).getHitBox().left==pathBounds.left&&constantObstacles.get(i).getHitBox().right==pathBounds.right)||(constantObstacles.get(i).getHitBox().top==pathBounds.top&&constantObstacles.get(i).getHitBox().bottom==pathBounds.bottom)) {
-                    wallPath.addRect(constantObstacles.get(i).getHitBox(),Path.Direction.CCW);
+               if ((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom)) {
+                   currentWall.union(constantObstacles.get(i).getHitBox());
                 }
                 else{
-                   walls.add(new Region());
-                   walls.get(increment).setPath(wallPath,new Region(0,0,(int)dpWidth,(int)dpHeight));
-                   wallPath.reset();
-                   wallPath.addRect(constantObstacles.get(i).getHitBox(),Path.Direction.CCW);
-                   increment++;
+                   walls.add(currentWall);
+                   currentWall.set(constantObstacles.get(i).getHitBox());
                }
                 if(i==constantObstacles.size()-1){//we reached the end, add the last region no matter what
-                    walls.add(new Region());
-                    walls.get(increment).setPath(wallPath,new Region(0,0,(int)dpWidth,(int)dpHeight));
+                    walls.add(currentWall);
                 }
             }
         }
@@ -183,8 +176,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     //only check against those that didn't TODO:Needs to change (if we have time).  Nested loops = Bad For Performance
                     Rect roundedHitBox=new Rect();
                     actors.get(i).getHitBox().round(roundedHitBox);
-                    for(Region wall:walls){
-                        if(!wall.quickReject(roundedHitBox)){
+                    for(RectF wall:walls){
+                        if(actors.get(i).isIntersecting(wall)){
                             collision=true;
                             break;
                         }
@@ -222,12 +215,12 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
             }
         }
         if(!walls.isEmpty()){//sanity check to be removed, simply highlights all regions so we can see their bounding boxes
-            for(Region condensedWalls:walls){
+            for(RectF condensedWalls:walls){
                 Paint testing=new Paint();//draw a green bounding box where the path/region should exist
                 testing.setColor(Color.GREEN);
                 testing.setStrokeWidth(2);
                 testing.setAlpha(25);
-                canvas.drawPath(condensedWalls.getBoundaryPath(), testing);
+                canvas.drawRect(condensedWalls, testing);
             }
         }
     }

@@ -140,6 +140,10 @@ public class GameObject {
         return false;
     }
 
+    public boolean isIntersecting(RectF other){//also checks if one contains the other
+        return RectF.intersects(other,this.hitBox);//|| hitBox.contains(other.getHitBox())||other.getHitBox().contains(this.hitBox)
+    }
+
     public void destroyGameObject(){
 
     }
