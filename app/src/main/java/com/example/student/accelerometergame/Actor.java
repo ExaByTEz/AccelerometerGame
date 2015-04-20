@@ -19,8 +19,8 @@ public class Actor extends GameObject {
     private float accelerometerScaleX;
     private float accelerometerScaleY;
 
-    public Actor(Bitmap bitmap, float x, float y, float accelerometerScaleX, float accelerometerScaleY, boolean solid, float scale ) {
-        super(bitmap, x, y, solid, scale);
+    public Actor(Bitmap bitmap, float[] spawn, float accelerometerScaleX, float accelerometerScaleY, boolean solid, float scale ) {
+        super(bitmap, spawn[0], spawn[1], solid, scale);
 
         this.accelerometerScaleX = accelerometerScaleX;
         this.accelerometerScaleY = accelerometerScaleY;

@@ -15,8 +15,8 @@ public class Obstacle extends GameObject{
 
     private ObstacleType obstacleType;
 
-    public Obstacle(Bitmap bitmap, float x, float y, boolean solid, float bitmapScale, ObstacleType obstacleType){
-        super(bitmap,x,y,solid,bitmapScale);
+    public Obstacle(Bitmap bitmap, float[] spawn, boolean solid, float bitmapScale, ObstacleType obstacleType){
+        super(bitmap,spawn[0],spawn[1],solid,bitmapScale);
         this.obstacleType = obstacleType;
         Log.d("Obstacle","obstacleType="+this.obstacleType);
     }

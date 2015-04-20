@@ -1,6 +1,7 @@
 package com.example.student.accelerometergame;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -38,20 +39,29 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private Paint text;
     private float dpWidth;
     private float dpHeight;
+    private boolean winFlag;
+    private int densityDpi;
     private float bitmapScale;
+    private Bitmap wallBitmap;
 
 
     public WorldView(Context context, MainActivity main, Display display){
         super(context);
         this.main = main;
 
+        winFlag = false; //TODO: We may need to move a lot of these into separate initialization methods, the WorldView constructor is getting too big
+
         Log.d("Display", "density="+getResources().getDisplayMetrics().density);
         this.bitmapScale = getResources().getDisplayMetrics().density;
+        Log.d("Display", "bitmapScale="+this.bitmapScale);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
         dpWidth=displayMetrics.widthPixels;
         dpHeight=displayMetrics.heightPixels;
-
+        densityDpi = displayMetrics.densityDpi;
+        Log.d("Display", "densityDpi="+densityDpi);
+        Log.d("Display", "width="+dpWidth);
+        Log.d("Display", "height="+dpHeight);
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
         obstacles = new ArrayList<>();
@@ -67,19 +77,23 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         thread = new WorldViewThread(this);
         getHolder().addCallback(this);
 
+        wallBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wall);
+
         //Create player and/or other actors
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 50, 50, 1, 1, true, bitmapScale)); //Index 0: Player
+        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), spawn(50,50), 1, 1, true, bitmapScale)); //Index 0: Player
         /* //Test Objects
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 150, 150, 0.2f,0, true, bitmapScale)); //Index 1: Test object
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0.5f, 0.5f, true, bitmapScale)); //Index 2: Test object
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, true, bitmapScale)); //Index 3: Test object
         */
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0, 0, true, bitmapScale)); //Index 4: Test object unaffected by accelerometer
-        constantObstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.wall),450,300,true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.wall),450,304,true, bitmapScale,Obstacle.ObstacleType.NONE));
+        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball),spawn(300,300), 0, 0, true, bitmapScale)); //Index 4: Test object unaffected by accelerometer
+        constantObstacles.add(new Obstacle(wallBitmap,spawn((dpWidth/2)+(wallBitmap.getWidth()*bitmapScale),800),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn(dpWidth/2,800),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn((200)+(wallBitmap.getWidth()*bitmapScale),500),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn(200,500),true, bitmapScale,Obstacle.ObstacleType.NONE));
         //Zones need to be solid to detect collision for now
-        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,300,true, bitmapScale, Obstacle.ObstacleType.END_ZONE));
-        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),400,600,true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
+        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(400,300),true, bitmapScale, Obstacle.ObstacleType.END_ZONE));
+        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(dpWidth-75,600),true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
 
         //put path array back here
         Path wallPath=new Path();
@@ -161,7 +175,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawColor(Color.WHITE);
 
         //Draw the time using drawText(String text, float x, float y, Paint paint)
-        canvas.drawText("Time: " + ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000), 200, 200, text);
+        canvas.drawText("Time: " + ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000), 15, 35, text);
     }
 
     /**
@@ -212,6 +226,10 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                 //Log.d("Obstacle", "Zone Type:" + obstacle.getObstacleType());
                 if(actors.get(0).isIntersecting(obstacle)){
                     Log.d("Obstacle", "Player is inside of " + obstacle.getObstacleType());
+                    if(obstacle.getObstacleType() == Obstacle.ObstacleType.END_ZONE && !winFlag){
+                        winFlag = true;
+                        endLevel();
+                    }
                 }
                 obstacle.draw(canvas);
             }
@@ -226,4 +244,27 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
             }
         }
     }
+
+    /**
+     * Spawn a GameObject relative to the screen density dpi
+     * @param x - The x coordinate to spawn a GameObject :float
+     * @param y - The y coordinate to spawn a GameObject :float
+     * @return the scaled spawn location
+     */
+    private float[] spawn(float x, float y){
+        Log.d("spawn", "Spawning (x, y): (" + x+","+y+") " );
+        Log.d("spawn", "pxToDp(" + x + "*" + bitmapScale + ")");
+        Log.d("spawn", densityDpi + "/160f");
+        return new float[]{pxToDp(x*bitmapScale), pxToDp(y*bitmapScale)};
+    }
+
+    private float pxToDp(float px){
+        return px / (densityDpi / 160f);
+    }
+
+    private void endLevel(){
+        Log.d("zones", "won level");
+    }
+
+
 }
