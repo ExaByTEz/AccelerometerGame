@@ -13,6 +13,7 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.Activity;
+import android.view.View;
 import android.view.Window;
 
 
@@ -52,12 +53,14 @@ public class MainActivity extends Activity implements SensorEventListener {
         worldView.changeThreadState(false);
         //Stop sensor when onPause is called
         sm.unregisterListener(this);
+        worldView.setVisibility(View.GONE);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         worldView.changeThreadState(false);
+        sm.unregisterListener(this);
     }
 
     @Override
@@ -72,6 +75,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         worldView.changeThreadState(true);
         //Start sensor when onResume is called
         sm.registerListener(this, sen, SensorManager.SENSOR_DELAY_NORMAL);
+        worldView.setVisibility(View.VISIBLE);
     }
 
     @Override
