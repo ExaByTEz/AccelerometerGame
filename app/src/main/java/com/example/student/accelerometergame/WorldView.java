@@ -6,10 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Region;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
  */
 public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private final String TAG = this.getClass().getSimpleName();
+    private final int PAR_TIME = 10;
 
     private WorldViewThread thread;
     private ArrayList<Actor> actors;
@@ -43,6 +42,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private int densityDpi;
     private float bitmapScale;
     private Bitmap wallBitmap;
+    private long timeWhenStopped = 0;
 
 
     public WorldView(Context context, MainActivity main, Display display){
@@ -131,6 +131,14 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
     public void changeThreadState(boolean running){
         thread.setRunning(running);
+        if(running){
+            chronometer.setBase(SystemClock.elapsedRealtime() + timeWhenStopped);
+            //timeWhenStopped = 0;
+            chronometer.start();
+        }else{
+            timeWhenStopped = (chronometer.getBase() - SystemClock.elapsedRealtime());
+            chronometer.stop();
+        }
     }
 
     @Override
@@ -168,7 +176,14 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawColor(Color.WHITE);
 
         //Draw the time using drawText(String text, float x, float y, Paint paint)
-        canvas.drawText("Time: " + ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000), 15, 35, text);
+        int time = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
+        canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
+        canvas.drawText("Time: " + time, 15, 35+text.getTextSize(), text);
+        if(winFlag){
+            canvas.drawText("Level Clear",dpWidth/2,dpHeight/2,text);
+            canvas.drawText("Score: " + (PAR_TIME -time > 0 ? PAR_TIME -time:0),dpWidth/2,dpHeight/2+text.getTextSize(),text);
+            thread.setRunning(false);
+        }
     }
 
     /**
