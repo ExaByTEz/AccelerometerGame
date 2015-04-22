@@ -52,7 +52,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         winFlag = false; //TODO: We may need to move a lot of these into separate initialization methods, the WorldView constructor is getting too big
 
         Log.d("Display", "density="+getResources().getDisplayMetrics().density);
-        this.bitmapScale = getResources().getDisplayMetrics().density;
+        this.bitmapScale = 1/getResources().getDisplayMetrics().density;
         Log.d("Display", "bitmapScale="+this.bitmapScale);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
