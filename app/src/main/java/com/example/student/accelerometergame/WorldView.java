@@ -88,7 +88,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         */
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball),spawn(300,300), 0, 0, true, bitmapScale)); //Index 4: Test object unaffected by accelerometer
         constantObstacles.add(new Obstacle(wallBitmap,spawn((dpWidth/2)+(wallBitmap.getWidth()*bitmapScale),800),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(wallBitmap,spawn(dpWidth/2,800),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn(dpWidth/2-200,800),true, bitmapScale,Obstacle.ObstacleType.NONE));
         constantObstacles.add(new Obstacle(wallBitmap,spawn((200)+(wallBitmap.getWidth()*bitmapScale),500),true, bitmapScale,Obstacle.ObstacleType.NONE));
         constantObstacles.add(new Obstacle(wallBitmap,spawn(200,500),true, bitmapScale,Obstacle.ObstacleType.NONE));
         //Zones need to be solid to detect collision for now
@@ -96,18 +96,18 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(dpWidth-75,600),true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
 
         //put path array back here
-        RectF currentWall=new RectF();
+        RectF currentWall;
 
         if(constantObstacles.size()>0) {
-            currentWall.set(constantObstacles.get(0).getHitBox());
+            currentWall=new RectF(constantObstacles.get(0).getHitBox());
 
-            for (int i=1;i<constantObstacles.size();i++) {
+            for (int i=1;i<constantObstacles.size();i++) {//does not check for intersection, can be used to draw very long walls by giving two points in order
                if ((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom)) {
                    currentWall.union(constantObstacles.get(i).getHitBox());
                 }
                 else{
                    walls.add(currentWall);
-                   currentWall.set(constantObstacles.get(i).getHitBox());
+                   currentWall=new RectF(constantObstacles.get(i).getHitBox());
                }
                 if(i==constantObstacles.size()-1){//we reached the end, add the last region no matter what
                     walls.add(currentWall);
@@ -203,8 +203,6 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     actors.get(i).translate(-main.getAccelX() * actors.get(i).getAccelerometerScaleX(), main.getAccelY() * actors.get(i).getAccelerometerScaleY());
 
                     //only check against those that didn't TODO:Needs to change (if we have time).  Nested loops = Bad For Performance
-                    Rect roundedHitBox=new Rect();
-                    actors.get(i).getHitBox().round(roundedHitBox);
                     for(RectF wall:walls){
                         if(actors.get(i).isIntersecting(wall)){
                             collision=true;
@@ -250,9 +248,9 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         if(!walls.isEmpty()){//sanity check to be removed, simply highlights all regions so we can see their bounding boxes
             for(RectF condensedWalls:walls){
                 Paint testing=new Paint();//draw a green bounding box where the path/region should exist
-                testing.setColor(Color.GREEN);
+                testing.setColor(Color.BLACK);
                 testing.setStrokeWidth(2);
-                testing.setAlpha(25);
+                //testing.setAlpha(25);
                 canvas.drawRect(condensedWalls, testing);
             }
         }
