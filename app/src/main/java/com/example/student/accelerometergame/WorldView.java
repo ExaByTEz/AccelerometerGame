@@ -29,7 +29,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
     private WorldViewThread thread;
     private ArrayList<Actor> actors;
-    private ArrayList<Obstacle> obstacles;
+    private ArrayList<Obstacle> zones;
     private ArrayList<RectF> walls;
     private ArrayList<Obstacle> constantObstacles;
     private MainActivity main;
@@ -40,8 +40,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private boolean winFlag;
     private int densityDpi;
     private float bitmapScale;
-    private Bitmap wallBitmap;
     private long timeWhenStopped = 0;
+    private int score = -1;
 
 
     public WorldView(Context context, MainActivity main, Display display){
@@ -63,7 +63,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         Log.d("Display", "height="+ pxHeight);
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
-        obstacles = new ArrayList<>();
+        zones = new ArrayList<>();
         walls=new ArrayList<>();
         constantObstacles=new ArrayList<>();
 
@@ -76,24 +76,19 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         thread = new WorldViewThread(this);
         getHolder().addCallback(this);
 
-        wallBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wall);
+        Bitmap wallBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wall);
+        Bitmap playerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
+
+        zones.add(new Obstacle(BitmapFactory.decodeResource(getResources(), R.drawable.end_zone), spawn(pxWidth - 75, 600), false, bitmapScale, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
+        zones.add(new Obstacle(BitmapFactory.decodeResource(getResources(), R.drawable.end_zone), spawn(400, 300), false, bitmapScale, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
 
         //Create player and/or other actors
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), spawn(50,50), 1, 1, true, bitmapScale)); //Index 0: Player
-        /* //Test Objects
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 150, 150, 0.2f,0, true, bitmapScale)); //Index 1: Test object
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 250, 250, 0.5f, 0.5f, true, bitmapScale)); //Index 2: Test object
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, true, bitmapScale)); //Index 3: Test object
-        */
-        actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball),spawn(300,300), 0, 0, true, bitmapScale)); //Index 4: Test object unaffected by accelerometer
+        actors.add(new Actor(playerBitmap, spawn(zones.get(0).getX(),zones.get(0).getY()), 1, 1, true, bitmapScale)); //Index 0: Player
         constantObstacles.add(new Obstacle(wallBitmap,spawn(250+(wallBitmap.getWidth()*bitmapScale),300),true, bitmapScale,Obstacle.ObstacleType.NONE));
         constantObstacles.add(new Obstacle(wallBitmap,spawn(250,400),true, bitmapScale,Obstacle.ObstacleType.NONE));
         constantObstacles.add(new Obstacle(wallBitmap,spawn(pxWidth/2-200,800),true, bitmapScale,Obstacle.ObstacleType.NONE));
         constantObstacles.add(new Obstacle(wallBitmap,spawn((200)+(wallBitmap.getWidth()),500),true, bitmapScale,Obstacle.ObstacleType.NONE));
         constantObstacles.add(new Obstacle(wallBitmap,spawn(200,500),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        //Zones need to be solid to detect collision for now
-        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(400,300),true, bitmapScale, Obstacle.ObstacleType.END_ZONE));
-        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(pxWidth -75,600),true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
 
         //put path array back here
         RectF currentWall;
@@ -141,6 +136,10 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         }
     }
 
+    public boolean getThreadState(){
+        return thread.getRunning();
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         if(thread.getState()==Thread.State.TERMINATED){
@@ -180,9 +179,10 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
         canvas.drawText("Time: " + time, 15, 35+text.getTextSize(), text);
         if(winFlag){
+            score = (score < 0 ? (PAR_TIME - time > 0 ? PAR_TIME - time : 0): score);
             canvas.drawText("Level Clear", pxWidth /2, pxHeight /2,text);
-            canvas.drawText("Score: " + (PAR_TIME -time > 0 ? PAR_TIME -time:0), pxWidth /2, pxHeight /2+text.getTextSize(),text);
-            thread.setRunning(false);
+            canvas.drawText("Score: " + score, pxWidth / 2, pxHeight / 2 + text.getTextSize(), text);
+            endLevel();
         }
     }
 
@@ -228,17 +228,16 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                 actors.get(i).draw(canvas); //Draw the actor on the canvas
             }
         }
-        if(!obstacles.isEmpty()){
-            for(Obstacle obstacle : obstacles){
+        if(!zones.isEmpty()){
+            for(Obstacle zone : zones){
                 //Log.d("Obstacle", "Zone Type:" + obstacle.getObstacleType());
-                if(actors.get(0).isIntersecting(obstacle)){
-                    Log.d("Obstacle", "Player is inside of " + obstacle.getObstacleType());
-                    if(obstacle.getObstacleType() == Obstacle.ObstacleType.END_ZONE && !winFlag){
+                if(actors.get(0).isIntersecting(zone.getHitBox())){
+                    Log.d("Obstacle", "Player is inside of " + zone.getObstacleType());
+                    if(zone.getObstacleType() == Obstacle.ObstacleType.END_ZONE && !winFlag){
                         winFlag = true;
-                        endLevel();
                     }
                 }
-                obstacle.draw(canvas);
+                zone.draw(canvas);
             }
         }
         if(!constantObstacles.isEmpty()){
@@ -269,7 +268,11 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
     private void endLevel(){
         Log.d("zones", "won level");
+        changeThreadState(false);
     }
 
+    public boolean getWinFlag(){
+        return winFlag;
+    }
 
 }

@@ -19,6 +19,9 @@ public class WorldViewThread extends Thread {
     public void setRunning(boolean run){
         running = run;
     }
+    public boolean getRunning(){
+        return running;
+    }
 
     /**
      * Render the actual WorldView canvas while the thread is running
