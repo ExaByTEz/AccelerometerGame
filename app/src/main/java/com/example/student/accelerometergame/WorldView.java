@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
@@ -36,8 +35,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private MainActivity main;
     private Chronometer chronometer;
     private Paint text;
-    private float dpWidth;
-    private float dpHeight;
+    private float pxWidth;
+    private float pxHeight;
     private boolean winFlag;
     private int densityDpi;
     private float bitmapScale;
@@ -56,12 +55,12 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         Log.d("Display", "bitmapScale="+this.bitmapScale);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
-        dpWidth=displayMetrics.widthPixels;
-        dpHeight=displayMetrics.heightPixels;
+        pxWidth = displayMetrics.widthPixels;
+        pxHeight = displayMetrics.heightPixels;
         densityDpi = displayMetrics.densityDpi;
         Log.d("Display", "densityDpi="+densityDpi);
-        Log.d("Display", "width="+dpWidth);
-        Log.d("Display", "height="+dpHeight);
+        Log.d("Display", "width="+ pxWidth);
+        Log.d("Display", "height="+ pxHeight);
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
         obstacles = new ArrayList<>();
@@ -87,13 +86,14 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball), 350, 350, 0, 0.6f, true, bitmapScale)); //Index 3: Test object
         */
         actors.add(new Actor(BitmapFactory.decodeResource(getResources(),R.drawable.ball),spawn(300,300), 0, 0, true, bitmapScale)); //Index 4: Test object unaffected by accelerometer
-        constantObstacles.add(new Obstacle(wallBitmap,spawn((dpWidth/2)+(wallBitmap.getWidth()*bitmapScale),800),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(wallBitmap,spawn(dpWidth/2-200,800),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(wallBitmap,spawn((200)+(wallBitmap.getWidth()*bitmapScale),500),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn(250+(wallBitmap.getWidth()*bitmapScale),300),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn(250,400),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn(pxWidth/2-200,800),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        constantObstacles.add(new Obstacle(wallBitmap,spawn((200)+(wallBitmap.getWidth()),500),true, bitmapScale,Obstacle.ObstacleType.NONE));
         constantObstacles.add(new Obstacle(wallBitmap,spawn(200,500),true, bitmapScale,Obstacle.ObstacleType.NONE));
         //Zones need to be solid to detect collision for now
         obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(400,300),true, bitmapScale, Obstacle.ObstacleType.END_ZONE));
-        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(dpWidth-75,600),true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
+        obstacles.add(new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.end_zone),spawn(pxWidth -75,600),true, bitmapScale, Obstacle.ObstacleType.START_ZONE));
 
         //put path array back here
         RectF currentWall;
@@ -180,8 +180,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
         canvas.drawText("Time: " + time, 15, 35+text.getTextSize(), text);
         if(winFlag){
-            canvas.drawText("Level Clear",dpWidth/2,dpHeight/2,text);
-            canvas.drawText("Score: " + (PAR_TIME -time > 0 ? PAR_TIME -time:0),dpWidth/2,dpHeight/2+text.getTextSize(),text);
+            canvas.drawText("Level Clear", pxWidth /2, pxHeight /2,text);
+            canvas.drawText("Score: " + (PAR_TIME -time > 0 ? PAR_TIME -time:0), pxWidth /2, pxHeight /2+text.getTextSize(),text);
             thread.setRunning(false);
         }
     }
@@ -192,6 +192,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
      */
     public void renderActors(Canvas canvas){
         if(!actors.isEmpty()){
+            Log.d("Coordinates", "(x,y)=(" + actors.get(0).getHitBox().left + "," + actors.get(0).getHitBox().top+")");
             for(int i=0;i<actors.size();i++){ //Iterate through all actors
                 if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
                     float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();
@@ -257,20 +258,13 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     }
 
     /**
-     * Spawn a GameObject relative to the screen density dpi
+     * Spawn a GameObject relative to the screen density dpi (Removed)
      * @param x - The x coordinate to spawn a GameObject :float
      * @param y - The y coordinate to spawn a GameObject :float
      * @return the scaled spawn location
      */
     private float[] spawn(float x, float y){
-        Log.d("spawn", "Spawning (x, y): (" + x+","+y+") " );
-        Log.d("spawn", "pxToDp(" + x + "*" + bitmapScale + ")");
-        Log.d("spawn", densityDpi + "/160f");
-        return new float[]{pxToDp(x*bitmapScale), pxToDp(y*bitmapScale)};
-    }
-
-    private float pxToDp(float px){
-        return px / (densityDpi / 160f);
+        return new float[]{x, y};
     }
 
     private void endLevel(){
