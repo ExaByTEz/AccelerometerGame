@@ -42,6 +42,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private float bitmapScale;
     private long timeWhenStopped = 0;
     private int score = -1;
+    private int time;
 
 
     public WorldView(Context context, MainActivity main, Display display){
@@ -175,7 +176,9 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawColor(Color.WHITE);
 
         //Draw the time using drawText(String text, float x, float y, Paint paint)
-        int time = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
+        if(!winFlag){
+            time = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
+        }
         canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
         canvas.drawText("Time: " + time, 15, 35+text.getTextSize(), text);
         if(winFlag){

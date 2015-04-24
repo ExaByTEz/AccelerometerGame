@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -18,6 +19,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class MainActivity extends Activity implements SensorEventListener {
     private SensorManager sm;
@@ -27,6 +31,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     private LinearLayout game;
     private LinearLayout gameWidgets;
     private TextView gameText;
+    private Button restartBtn;
+    private Button pauseBtn;
+    private Button resumeBtn;
     //private static final int SHAKE_THRESHOLD = 500;
     private float x;
     private float y;
@@ -44,7 +51,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         game.setOrientation(LinearLayout.VERTICAL);
         gameWidgets = new LinearLayout(this);
         gameWidgets.setOrientation(LinearLayout.HORIZONTAL);
-        worldView = new WorldView(this, this, getWindowManager().getDefaultDisplay());
 
         gameText = new TextView(this);
         gameText.setText("GAME PAUSED");
@@ -55,10 +61,9 @@ public class MainActivity extends Activity implements SensorEventListener {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
-        Button restartBtn = new Button(this);
+        restartBtn = new Button(this);
         restartBtn.setText("Restart");
         restartBtn.setTextSize(12);
-
         restartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,10 +72,11 @@ public class MainActivity extends Activity implements SensorEventListener {
                 worldView = new WorldView(v.getContext(), (MainActivity)v.getContext(), getWindowManager().getDefaultDisplay());
                 addViewsToGame();
                 Log.d("button","restart btn clicked");
+                Log.d("button","Game time:"+ SystemClock.elapsedRealtime());
             }
         });
 
-        Button pauseBtn = new Button(this);
+        pauseBtn = new Button(this);
         pauseBtn.setText("Pause");
         pauseBtn.setTextSize(12);
         pauseBtn.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +93,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        Button resumeBtn = new Button(this);
+        resumeBtn = new Button(this);
         resumeBtn.setText("Resume");
         resumeBtn.setTextSize(12);
         resumeBtn.setOnClickListener(new View.OnClickListener() {
@@ -106,6 +112,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         gameWidgets.addView(pauseBtn);
         gameWidgets.addView(resumeBtn);
 
+        worldView = new WorldView(this, this, getWindowManager().getDefaultDisplay());
         addViewsToGame();
 
 
@@ -219,6 +226,25 @@ public class MainActivity extends Activity implements SensorEventListener {
         game.addView(gameWidgets);
         game.addView(worldView);
         game.addView(gameText);
+        delayButton(restartBtn, 2000);
+        delayButton(pauseBtn, 2000);
+        delayButton(resumeBtn, 2000);
+    }
+
+    private void delayButton(final Button button, int delay){
+        button.setEnabled(false);
+        Timer buttonTimer = new Timer();
+        buttonTimer.schedule(new TimerTask(){
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable(){
+                    @Override
+                    public void run() {
+                        button.setEnabled(true);
+                    }
+                });
+            }
+        },delay);
     }
 
 }
