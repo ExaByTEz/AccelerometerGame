@@ -210,19 +210,17 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     for(RectF wall:walls){
                         if(actors.get(i).isIntersecting(wall)){
                             collision=true;
+                            actors.set(i,slideCollision(actors.get(i),wall,oldX,oldY));
                             break;
                         }
                     }
-                    if (collision) {//walls.get(0).quickReject(roundedHitBox)
-                        Log.d("Collision", "Collision Successful with Complex Region");
-                        actors.get(i).translate(-oldX, -oldY);
-                    } else {
+                    if(!collision) {
                         for (int j = i + 1; j < actors.size(); j++) {
                             if (actors.get(i).isIntersecting(actors.get(j))) {
                                 //actors.get(i).translate(-oldX,-oldY);//for now, just stop them
                                 //collision = true;
                                 Log.d("Collision", "Collision Successful with Actor");
-                                actors.get(i).translate(-oldX, -oldY);
+                                actors.set(i, slideCollision(actors.get(i), actors.get(j).getHitBox(), oldX, oldY));
                                 break;
                             }
                         }
@@ -276,6 +274,23 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
     public boolean getWinFlag(){
         return winFlag;
+    }
+
+    private Actor slideCollision(Actor actor,RectF objectHit,float oldX, float oldY){
+        RectF xMovementOnly=new RectF(actor.getHitBox());
+        xMovementOnly.offset(0,-oldY);
+        RectF yMovementOnly=new RectF(actor.getHitBox());
+        yMovementOnly.offset(-oldX,0);
+        if(RectF.intersects(xMovementOnly,objectHit)){
+            actor.translate(-oldX, 0);
+        }
+        else if(RectF.intersects(yMovementOnly,objectHit)){
+            actor.translate(0, -oldY);
+        }
+        else{//both directions cause collision
+            actor.translate(-oldX, -oldY);
+        }
+        return actor;
     }
 
 }
