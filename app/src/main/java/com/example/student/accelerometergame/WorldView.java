@@ -1,6 +1,8 @@
 package com.example.student.accelerometergame;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -55,7 +57,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
         PX_WIDTH = displayMetrics.widthPixels;
-        PX_HEIGHT = displayMetrics.heightPixels;
+        PX_HEIGHT = displayMetrics.heightPixels-50;
         densityDpi = displayMetrics.densityDpi;
         Log.d("Display", "densityDpi="+densityDpi);
         Log.d("Display", "width="+ PX_WIDTH);
@@ -77,6 +79,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
         new Level(actors, zones, constantObstacles, 1, true, this);
 
+       
         //put path array back here
         RectF currentWall;
 
@@ -84,13 +87,13 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
             currentWall=new RectF(constantObstacles.get(0).getHitBox());
 
             for (int i=1;i<constantObstacles.size();i++) {//does not check for intersection, can be used to draw very long walls by giving two points in order
-                if ((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom)) {
-                    currentWall.union(constantObstacles.get(i).getHitBox());
+               if ((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom)) {
+                   currentWall.union(constantObstacles.get(i).getHitBox());
                 }
                 else{
-                    walls.add(currentWall);
-                    currentWall=new RectF(constantObstacles.get(i).getHitBox());
-                }
+                   walls.add(currentWall);
+                   currentWall=new RectF(constantObstacles.get(i).getHitBox());
+               }
                 if(i==constantObstacles.size()-1){//we reached the end, add the last region no matter what
                     walls.add(currentWall);
                 }
@@ -181,7 +184,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
      */
     public void renderActors(Canvas canvas){
         if(!actors.isEmpty()){
-            Log.d("Coordinates", "(x,y)=(" + actors.get(0).getHitBox().left + "," + actors.get(0).getHitBox().top+")");
+            //("Coordinates", "(x,y)=(" + actors.get(0).getHitBox().left + "," + actors.get(0).getHitBox().top+")");
             for(int i=0;i<actors.size();i++){ //Iterate through all actors
                 if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
                     float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();

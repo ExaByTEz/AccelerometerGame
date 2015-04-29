@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,11 +47,11 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_main);
 
-        game = new LinearLayout(this);
-        game.setOrientation(LinearLayout.VERTICAL);
-        gameWidgets = new LinearLayout(this);
-        gameWidgets.setOrientation(LinearLayout.HORIZONTAL);
+        game = (LinearLayout)findViewById(R.id.game);
+        gameWidgets=(LinearLayout)findViewById(R.id.gameWidget);
 
         gameText = new TextView(this);
         gameText.setText("GAME PAUSED");
@@ -61,9 +62,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
-        restartBtn = new Button(this);
-        restartBtn.setText("Restart");
-        restartBtn.setTextSize(12);
+        restartBtn = (Button)findViewById(R.id.restart);
         restartBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,9 +75,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        pauseBtn = new Button(this);
-        pauseBtn.setText("Pause");
-        pauseBtn.setTextSize(12);
+        pauseBtn = (Button)findViewById(R.id.pause);
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,9 +90,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        resumeBtn = new Button(this);
-        resumeBtn.setText("Resume");
-        resumeBtn.setTextSize(12);
+        resumeBtn = (Button)findViewById(R.id.resume);
         resumeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -108,16 +103,11 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        gameWidgets.addView(restartBtn);
-        gameWidgets.addView(pauseBtn);
-        gameWidgets.addView(resumeBtn);
-
         worldView = new WorldView(this, this, getWindowManager().getDefaultDisplay());
+        game.removeAllViews();
         addViewsToGame();
 
-
         setContentView(game);
-
 
         //Setup the sensor manager and the sensor used for the accelerometer
         sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
