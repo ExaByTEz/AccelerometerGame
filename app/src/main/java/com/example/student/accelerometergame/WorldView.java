@@ -1,8 +1,6 @@
 package com.example.student.accelerometergame;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -35,11 +33,11 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private MainActivity main;
     private Chronometer chronometer;
     private Paint text;
-    private float pxWidth;
-    private float pxHeight;
+    public final float PX_WIDTH;
+    public final float PX_HEIGHT;
     private boolean winFlag;
     private int densityDpi;
-    private float bitmapScale;
+    public final float BITMAP_SCALE;
     private long timeWhenStopped = 0;
     private int score = -1;
     private int time;
@@ -52,16 +50,16 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         winFlag = false; //TODO: We may need to move a lot of these into separate initialization methods, the WorldView constructor is getting too big
 
         Log.d("Display", "density="+getResources().getDisplayMetrics().density);
-        this.bitmapScale = 1/getResources().getDisplayMetrics().density;
-        Log.d("Display", "bitmapScale="+this.bitmapScale);
+        this.BITMAP_SCALE = 1/getResources().getDisplayMetrics().density;
+        Log.d("Display", "BITMAP_SCALE="+this.BITMAP_SCALE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
-        pxWidth = displayMetrics.widthPixels;
-        pxHeight = displayMetrics.heightPixels;
+        PX_WIDTH = displayMetrics.widthPixels;
+        PX_HEIGHT = displayMetrics.heightPixels;
         densityDpi = displayMetrics.densityDpi;
         Log.d("Display", "densityDpi="+densityDpi);
-        Log.d("Display", "width="+ pxWidth);
-        Log.d("Display", "height="+ pxHeight);
+        Log.d("Display", "width="+ PX_WIDTH);
+        Log.d("Display", "height="+ PX_HEIGHT);
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
         zones = new ArrayList<>();
@@ -77,19 +75,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         thread = new WorldViewThread(this);
         getHolder().addCallback(this);
 
-        Bitmap wallBitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wall);
-        Bitmap playerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
-
-        zones.add(new Obstacle(BitmapFactory.decodeResource(getResources(), R.drawable.end_zone), spawn(pxWidth - 75, 600), false, bitmapScale, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
-        zones.add(new Obstacle(BitmapFactory.decodeResource(getResources(), R.drawable.end_zone), spawn(400, 300), false, bitmapScale, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
-
-        //Create player and/or other actors
-        actors.add(new Actor(playerBitmap, spawn(zones.get(0).getX(),zones.get(0).getY()), 1, 1, true, bitmapScale)); //Index 0: Player
-        constantObstacles.add(new Obstacle(wallBitmap,spawn(250+(wallBitmap.getWidth()*bitmapScale),300),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(wallBitmap,spawn(250,400),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(wallBitmap,spawn(pxWidth/2-200,800),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(wallBitmap,spawn((200)+(wallBitmap.getWidth()),500),true, bitmapScale,Obstacle.ObstacleType.NONE));
-        constantObstacles.add(new Obstacle(wallBitmap,spawn(200,500),true, bitmapScale,Obstacle.ObstacleType.NONE));
+        new Level(actors, zones, constantObstacles, 1, true, this);
 
         //put path array back here
         RectF currentWall;
@@ -98,13 +84,13 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
             currentWall=new RectF(constantObstacles.get(0).getHitBox());
 
             for (int i=1;i<constantObstacles.size();i++) {//does not check for intersection, can be used to draw very long walls by giving two points in order
-               if ((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom)) {
-                   currentWall.union(constantObstacles.get(i).getHitBox());
+                if ((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom)) {
+                    currentWall.union(constantObstacles.get(i).getHitBox());
                 }
                 else{
-                   walls.add(currentWall);
-                   currentWall=new RectF(constantObstacles.get(i).getHitBox());
-               }
+                    walls.add(currentWall);
+                    currentWall=new RectF(constantObstacles.get(i).getHitBox());
+                }
                 if(i==constantObstacles.size()-1){//we reached the end, add the last region no matter what
                     walls.add(currentWall);
                 }
@@ -183,8 +169,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawText("Time: " + time, 15, 35+text.getTextSize(), text);
         if(winFlag){
             score = (score < 0 ? (PAR_TIME - time > 0 ? PAR_TIME - time : 0): score);
-            canvas.drawText("Level Clear", pxWidth /2, pxHeight /2,text);
-            canvas.drawText("Score: " + score, pxWidth / 2, pxHeight / 2 + text.getTextSize(), text);
+            canvas.drawText("Level Clear", PX_WIDTH /2, PX_HEIGHT /2,text);
+            canvas.drawText("Score: " + score, PX_WIDTH / 2, PX_HEIGHT / 2 + text.getTextSize(), text);
             endLevel();
         }
     }

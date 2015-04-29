@@ -33,10 +33,10 @@ public class GameObject {
      * @param bitmapScale - Scale to draw the bitmap :float
      */
     public GameObject(Bitmap bitmap, float x, float y, boolean solid, float bitmapScale){
-        //localImage.setWidth((int) (localImage.getWidth()*bitmapScale+.5f));
+        //localImage.setWidth((int) (localImage.getWidth()*BITMAP_SCALE+.5f));
 
-        //x = x*bitmapScale;
-        //y = y*bitmapScale;
+        //x = x*BITMAP_SCALE;
+        //y = y*BITMAP_SCALE;
 
         this.solid = solid;
         this.bitmapScale = bitmapScale;
