@@ -35,6 +35,8 @@ public class WorldViewThread extends Thread {
                 synchronized (view.getHolder()){
                     view.render(c);
                     //other code to update actors
+                    view.renderZones(c);
+
                     view.renderActors(c);
 
                     view.renderText(c);
