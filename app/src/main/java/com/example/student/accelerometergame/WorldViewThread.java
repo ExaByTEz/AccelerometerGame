@@ -37,6 +37,8 @@ public class WorldViewThread extends Thread {
                     //other code to update actors
                     view.renderActors(c);
 
+                    view.renderText(c);
+
                 }
             }finally {
                 if(c != null){
