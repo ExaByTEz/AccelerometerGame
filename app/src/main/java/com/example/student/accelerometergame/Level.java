@@ -29,13 +29,6 @@ public class Level {
         Bitmap wallBitmapVert = BitmapFactory.decodeResource(view.getResources(), R.drawable.wallvert);
         Bitmap playerBitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.ball);
 
-        zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.end_zone), spawn(view.PX_HEIGHT - 75, 600), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
-        zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.end_zone), spawn(400, 300), false, view.BITMAP_SCALE, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
-
-        //Create player and/or other actors
-        actors.add(new Actor(playerBitmap, spawn(zones.get(0).getX(),zones.get(0).getY()), 1, 1, true, view.BITMAP_SCALE)); //Index 0: Player
-
-
         switch(levelId){
             case 1:
                 zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.end_zone), spawn(150, 150), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
@@ -58,8 +51,17 @@ public class Level {
                 constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
 
                 //rest of level
-                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(0,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
-                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(0,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH,view.PX_HEIGHT*.4f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.3f,view.PX_HEIGHT*.4f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(0,view.PX_HEIGHT*.6f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*.6f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH,view.PX_HEIGHT*.8f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.3f,view.PX_HEIGHT*.8f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
                 break;
             case 2:
                 zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.end_zone), spawn(150, 150), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
