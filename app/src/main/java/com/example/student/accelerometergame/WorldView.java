@@ -168,22 +168,6 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
         //Draw the canvas
         canvas.drawColor(Color.WHITE);
-
-        //Draw the time using drawText(String text, float x, float y, Paint paint)
-        if(!winFlag){
-            time = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
-        }
-        canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
-        canvas.drawText("Time: " + time, 15, 35 + text.getTextSize(), text);
-        if(winFlag){
-            score = (score < 0 ? (PAR_TIME - time > 0 ? PAR_TIME - time : 0): score);
-            Paint textCentered = text;
-            textCentered.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("Level Clear", PX_WIDTH /2, PX_HEIGHT /2,textCentered);
-            canvas.drawText("Score: " + score, PX_WIDTH / 2, PX_HEIGHT / 2 + text.getTextSize(), textCentered);
-            canvas.drawText("Touch Screen to Continue", PX_WIDTH / 2, PX_HEIGHT / 2 + 2*text.getTextSize(), textCentered);
-            endLevel();
-        }
     }
 
     /**
@@ -267,6 +251,24 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
      */
     private float[] spawn(float x, float y){
         return new float[]{x, y};
+    }
+
+    public void renderText(Canvas canvas){
+        //Draw the time using drawText(String text, float x, float y, Paint paint)
+        if(!winFlag){
+            time = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
+        }
+        canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
+        canvas.drawText("Time: " + time, 15, 35 + text.getTextSize(), text);
+        if(winFlag){
+            score = (score < 0 ? (PAR_TIME - time > 0 ? PAR_TIME - time : 0): score);
+            Paint textCentered = text;
+            textCentered.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText("Level Clear", PX_WIDTH /2, PX_HEIGHT /2,textCentered);
+            canvas.drawText("Score: " + score, PX_WIDTH / 2, PX_HEIGHT / 2 + text.getTextSize(), textCentered);
+            canvas.drawText("Touch Screen to Continue", PX_WIDTH / 2, PX_HEIGHT / 2 + 2*text.getTextSize(), textCentered);
+            endLevel();
+        }
     }
 
     private void endLevel(){
