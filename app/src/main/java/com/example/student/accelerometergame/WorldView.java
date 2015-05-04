@@ -204,6 +204,13 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     actors.get(i).translate(-main.getAccelX() * actors.get(i).getAccelerometerScaleX(), main.getAccelY() * actors.get(i).getAccelerometerScaleY());
 
                     //only check against those that didn't TODO:Needs to change (if we have time).  Nested loops = Bad For Performance
+                    //collision for actors, only check for collision with all other actors
+                    for(int j=0; j<actors.size(); j++){
+                        if(i != j && actors.get(i).isIntersecting(actors.get(j))){
+                            collision = true;
+                            actors.set(i,slideCollision(actors.get(i),actors.get(j).getHitBox(),oldX,oldY));
+                        }
+                    }
                     for(RectF wall:walls){
                         if(actors.get(i).isIntersecting(wall)){
                             collision=true;

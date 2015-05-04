@@ -148,4 +148,12 @@ public class GameObject {
 
     }
 
+    public int getWidth(){
+        return (int)(hitBox.right-hitBox.left);
+    }
+
+    public int getHeight(){
+        return (int)(hitBox.bottom-hitBox.top);
+    }
+
 }
