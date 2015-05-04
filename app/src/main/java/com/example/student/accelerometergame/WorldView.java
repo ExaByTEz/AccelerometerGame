@@ -82,17 +82,20 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
        
         //put path array back here
         RectF currentWall;
+        boolean doNotExit=true;
 
         if(constantObstacles.size()>0) {
             currentWall=new RectF(constantObstacles.get(0).getHitBox());
 
             for (int i=1;i<constantObstacles.size();i++) {//does not check for intersection, can be used to draw very long walls by giving two points in order
-               if ((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom)) {
+               if (((constantObstacles.get(i).getHitBox().left==currentWall.left&&constantObstacles.get(i).getHitBox().right==currentWall.right)||(constantObstacles.get(i).getHitBox().top==currentWall.top&&constantObstacles.get(i).getHitBox().bottom==currentWall.bottom))&&doNotExit) {
                    currentWall.union(constantObstacles.get(i).getHitBox());
+                   doNotExit=false;
                 }
                 else{
                    walls.add(currentWall);
                    currentWall=new RectF(constantObstacles.get(i).getHitBox());
+                   doNotExit=true;
                }
                 if(i==constantObstacles.size()-1){//we reached the end, add the last region no matter what
                     walls.add(currentWall);
@@ -200,7 +203,6 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                         if(actors.get(i).isIntersecting(wall)){
                             collision=true;
                             actors.set(i,slideCollision(actors.get(i),wall,oldX,oldY));
-                            break;
                         }
                     }
                     if(!collision) {
@@ -210,7 +212,6 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                                 //collision = true;
                                 Log.d("Collision", "Collision Successful with Actor");
                                 actors.set(i, slideCollision(actors.get(i), actors.get(j).getHitBox(), oldX, oldY));
-                                break;
                             }
                         }
                     }
@@ -273,11 +274,8 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         if(RectF.intersects(xMovementOnly,objectHit)){
             actor.translate(-oldX, 0);
         }
-        else if(RectF.intersects(yMovementOnly,objectHit)){
+        if(RectF.intersects(yMovementOnly,objectHit)){
             actor.translate(0, -oldY);
-        }
-        else{//both directions cause collision
-            actor.translate(-oldX, -oldY);
         }
         return actor;
     }

@@ -17,17 +17,18 @@ import java.util.ArrayList;
 public class Level {
     private final String TAG = this.getClass().getSimpleName();
 
-    Level(ArrayList<Actor> actors, ArrayList<Obstacle> zones, ArrayList<Obstacle> obstacles, int levelId, boolean clearGameObjects, WorldView view){
+    Level(ArrayList<Actor> actors, ArrayList<Obstacle> zones, ArrayList<Obstacle> constantObstacles, int levelId, boolean clearGameObjects, WorldView view){
         if(clearGameObjects){
             actors.clear();
             zones.clear();
-            obstacles.clear();
+            constantObstacles.clear();
         }
 
         Bitmap wallBitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.wall);
+        Bitmap wallBitmapVert = BitmapFactory.decodeResource(view.getResources(), R.drawable.wallvert);
         Bitmap playerBitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.ball);
 
-        zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.end_zone), spawn(view.PX_HEIGHT - 75, 600), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
+        zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.end_zone), spawn(view.PX_WIDTH - 75, 600), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
         zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.end_zone), spawn(400, 300), false, view.BITMAP_SCALE, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
 
         //Create player and/or other actors
@@ -36,7 +37,22 @@ public class Level {
 
         switch(levelId){
             case 1:
-                obstacles.add(new Obstacle(wallBitmap,spawn(250+(wallBitmap.getWidth()*view.BITMAP_SCALE),300),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                //top and bottom of screen
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(0,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(0,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+
+                //left and right side screen
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(0,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(0,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                //rest of level
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(0,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
                 break;
             default: Log.d(TAG,"Invalid level: " + levelId); break;
         }
