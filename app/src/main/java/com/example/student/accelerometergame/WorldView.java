@@ -11,8 +11,10 @@ import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Chronometer;
 
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private int time;
 
 
-    public WorldView(Context context, MainActivity main, Display display){
+    public WorldView(int level, Context context, MainActivity main, Display display){
         super(context);
         this.main = main;
 
@@ -77,7 +79,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         thread = new WorldViewThread(this);
         getHolder().addCallback(this);
 
-        new Level(actors, zones, constantObstacles, 1, true, this);
+        new Level(actors, zones, constantObstacles, level, true, this);
 
        
         //put path array back here
@@ -172,11 +174,14 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
             time = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
         }
         canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
-        canvas.drawText("Time: " + time, 15, 35+text.getTextSize(), text);
+        canvas.drawText("Time: " + time, 15, 35 + text.getTextSize(), text);
         if(winFlag){
             score = (score < 0 ? (PAR_TIME - time > 0 ? PAR_TIME - time : 0): score);
-            canvas.drawText("Level Clear", PX_WIDTH /2, PX_HEIGHT /2,text);
-            canvas.drawText("Score: " + score, PX_WIDTH / 2, PX_HEIGHT / 2 + text.getTextSize(), text);
+            Paint textCentered = text;
+            textCentered.setTextAlign(Paint.Align.CENTER);
+            canvas.drawText("Level Clear", PX_WIDTH /2, PX_HEIGHT /2,textCentered);
+            canvas.drawText("Score: " + score, PX_WIDTH / 2, PX_HEIGHT / 2 + text.getTextSize(), textCentered);
+            canvas.drawText("Touch Screen to Continue", PX_WIDTH / 2, PX_HEIGHT / 2 + 2*text.getTextSize(), textCentered);
             endLevel();
         }
     }
@@ -260,6 +265,14 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private void endLevel(){
         Log.d("zones", "won level");
         changeThreadState(false);
+        //"Restart" the game to the next level when the screen is touched
+        this.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                main.nextLevel();
+                return false;
+            }
+        });
     }
 
     public boolean getWinFlag(){

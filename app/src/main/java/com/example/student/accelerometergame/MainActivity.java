@@ -25,6 +25,7 @@ import java.util.TimerTask;
 
 
 public class MainActivity extends Activity implements SensorEventListener {
+    public final int MAX_GAME_LEVEL;
     private SensorManager sm;
     private Sensor sen;
     private long lastUpdate;
@@ -38,7 +39,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     //private static final int SHAKE_THRESHOLD = 500;
     private float x;
     private float y;
+    private int gameLevel;
     public MainActivity(){
+        gameLevel = 1;
+        MAX_GAME_LEVEL = 2;
         lastUpdate = 0;
         x = 0;
         y = 0;
@@ -68,7 +72,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             public void onClick(View v) {
                 worldView.changeThreadState(false);
                 game.removeAllViews();
-                worldView = new WorldView(v.getContext(), (MainActivity)v.getContext(), getWindowManager().getDefaultDisplay());
+                worldView = new WorldView(gameLevel, v.getContext(), (MainActivity)v.getContext(), getWindowManager().getDefaultDisplay());
                 addViewsToGame();
                 Log.d("button","restart btn clicked");
                 Log.d("button","Game time:"+ SystemClock.elapsedRealtime());
@@ -103,7 +107,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        worldView = new WorldView(this, this, getWindowManager().getDefaultDisplay());
+        worldView = new WorldView(gameLevel, this, this, getWindowManager().getDefaultDisplay());
         game.removeAllViews();
         addViewsToGame();
 
@@ -237,4 +241,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         },delay);
     }
 
+    public void nextLevel(){
+        gameLevel += (gameLevel < MAX_GAME_LEVEL ? 1 : 0);
+        restartBtn.callOnClick();
+    }
 }
