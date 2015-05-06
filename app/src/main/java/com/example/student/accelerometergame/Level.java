@@ -113,6 +113,52 @@ public class Level {
                 constantObstacles.add(new Obstacle(wallBitmap, spawn(player.getWidth()*3, view.PX_HEIGHT*0.7f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
                 constantObstacles.add(new Obstacle(wallBitmap, spawn((view.PX_WIDTH-2*(player.getWidth()*3)), view.PX_HEIGHT*0.7f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
                 break;
+            case 4:
+                PAR_TIME = 60;
+
+                Bitmap longWallBitmap = Bitmap.createScaledBitmap(wallBitmap, wallBitmap.getWidth()*3,wallBitmap.getHeight(),false);
+                Bitmap longWallBitmapVert = Bitmap.createScaledBitmap(wallBitmapVert, wallBitmapVert.getWidth(),wallBitmapVert.getHeight()*2,false);
+
+                zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.start_zone), spawn(view.PX_WIDTH*0.9f, view.PX_HEIGHT*0.1f), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
+                zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.finish_zone), spawn(view.PX_WIDTH*0.9f, view.PX_HEIGHT*0.9f), false, view.BITMAP_SCALE, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
+
+                actors.add(new Actor(playerBitmap, spawn(zones.get(0).getX(),zones.get(0).getY()), 1, 1, true, view.BITMAP_SCALE)); //Index 0: Player
+                player = actors.get(0);
+
+                //Top Wall
+                constantObstacles.add(new Obstacle(wallBitmap, spawn(0, 0), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap, spawn(view.PX_WIDTH, 0), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                //Bottom Wall
+                constantObstacles.add(new Obstacle(wallBitmap, spawn(0, view.PX_HEIGHT), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap, spawn(view.PX_WIDTH, view.PX_HEIGHT), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                //Left Wall
+                constantObstacles.add(new Obstacle(wallBitmapVert, spawn(0, 0), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert, spawn(0, view.PX_HEIGHT), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                //Right Wall
+                constantObstacles.add(new Obstacle(wallBitmapVert, spawn(view.PX_WIDTH, 0), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert, spawn(view.PX_WIDTH, view.PX_HEIGHT), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap, spawn((player.getWidth()*3), view.PX_HEIGHT*0.2f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap, spawn(view.PX_WIDTH, view.PX_HEIGHT*0.2f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmapVert, spawn((player.getWidth()*6.3f), (view.PX_HEIGHT*0.2f)-(wallBitmap.getHeight())), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+
+                //Moving Wall
+                actors.add(new Actor(longWallBitmap,spawn((player.getWidth()), (view.PX_HEIGHT*0.2f)-(wallBitmap.getHeight())),0.3f,0,true,view.BITMAP_SCALE));
+                actors.add(new Actor(longWallBitmapVert,spawn((player.getWidth()*3), (view.PX_HEIGHT*0.1f)-(wallBitmap.getHeight())),0,1,true,view.BITMAP_SCALE));
+                actors.add(new Actor(longWallBitmap,spawn((view.PX_WIDTH*0.8f), (view.PX_HEIGHT*0.05f)),1,0,true,view.BITMAP_SCALE));
+
+                constantObstacles.add(new Obstacle(wallBitmap, spawn(0, view.PX_HEIGHT*0.3f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap, spawn(view.PX_WIDTH*0.5f, view.PX_HEIGHT*0.3f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmapVert, spawn(view.PX_WIDTH*0.5f, view.PX_HEIGHT*0.3f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
+
+                //Moving Wall
+                actors.add(new Actor(longWallBitmap,spawn(view.PX_WIDTH*0.8f, (view.PX_HEIGHT*0.4f)),1,0,true,view.BITMAP_SCALE));
+                actors.add(new Actor(longWallBitmap,spawn(view.PX_WIDTH*0.8f, (view.PX_HEIGHT*0.5f)),1,0,true,view.BITMAP_SCALE));
+                actors.add(new Actor(longWallBitmap,spawn(view.PX_WIDTH*0.8f, (view.PX_HEIGHT*0.6f)),1,0,true,view.BITMAP_SCALE));
+
+                break;
             default:
                 PAR_TIME=0;
                 Log.d(TAG,"Invalid level: " + levelId);

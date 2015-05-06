@@ -42,7 +42,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private int gameLevel;
     public MainActivity(){
         gameLevel = 1;
-        MAX_GAME_LEVEL = 2;
+        MAX_GAME_LEVEL = 4;
         lastUpdate = 0;
         x = 0;
         y = 0;
@@ -220,9 +220,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         game.addView(gameWidgets);
         game.addView(worldView);
         game.addView(gameText);
-        delayButton(restartBtn, 2000);
-        delayButton(pauseBtn, 2000);
-        delayButton(resumeBtn, 2000);
+        delayButton(restartBtn, 500);
+        delayButton(pauseBtn, 500);
+        delayButton(resumeBtn, 500);
     }
 
     private void delayButton(final Button button, int delay){
