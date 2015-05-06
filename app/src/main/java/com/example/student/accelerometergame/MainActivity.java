@@ -41,8 +41,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     private float y;
     private int gameLevel;
     public MainActivity(){
-        gameLevel = 1;
-        MAX_GAME_LEVEL = 2;
+        gameLevel = 3;
+        MAX_GAME_LEVEL = 3;
         lastUpdate = 0;
         x = 0;
         y = 0;

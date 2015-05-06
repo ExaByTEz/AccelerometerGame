@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.util.Log;
 
@@ -113,12 +115,13 @@ public class GameObject {
     public void draw(Canvas canvas){
         canvas.drawBitmap(bitmap, hitBox.left, hitBox.top, null);
 
+        /*
         Paint testing=new Paint();//draw a blue bounding box where the bitmap should be
         testing.setColor(Color.BLUE);
         testing.setAlpha(25);
         testing.setStrokeWidth(2);
         canvas.drawRect(hitBox,testing);
-
+        */
     }
 
     public boolean isSolid(){
@@ -144,8 +147,26 @@ public class GameObject {
         return RectF.intersects(other,this.hitBox);//|| hitBox.contains(other.getHitBox())||other.getHitBox().contains(this.hitBox)
     }
 
+    /**
+     * Checks if a point is intersecting a RectF
+     * @param point - The point to check for a collision :PointF
+     * @param other - The RectF to check a collision with :RectF
+     * @return If the point collides with the RectF
+     */
+    public boolean pointIsIntersecting(PointF point, RectF other){//also checks if one contains the other
+        return RectF.intersects(other,new RectF(point.x, point.y, point.x, point.y));//|| hitBox.contains(other.getHitBox())||other.getHitBox().contains(this.hitBox)
+    }
+
     public void destroyGameObject(){
 
+    }
+
+    public int getWidth(){
+        return (int)(hitBox.right-hitBox.left);
+    }
+
+    public int getHeight(){
+        return (int)(hitBox.bottom-hitBox.top);
     }
 
 }

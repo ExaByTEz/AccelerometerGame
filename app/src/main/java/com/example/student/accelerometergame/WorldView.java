@@ -1,11 +1,10 @@
 package com.example.student.accelerometergame;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
  */
 public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private final String TAG = this.getClass().getSimpleName();
-    private final int PAR_TIME = 10;
 
     private WorldViewThread thread;
     private ArrayList<Actor> actors;
@@ -45,6 +43,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     private long timeWhenStopped = 0;
     private int score = -1;
     private int time;
+    private Level gameLevel;
 
 
     public WorldView(int level, Context context, MainActivity main, Display display){
@@ -79,7 +78,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         thread = new WorldViewThread(this);
         getHolder().addCallback(this);
 
-        new Level(actors, zones, constantObstacles, level, true, this);
+        gameLevel = new Level(actors, zones, constantObstacles, level, true, this);
 
        
         //put path array back here
@@ -170,6 +169,21 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         canvas.drawColor(Color.WHITE);
     }
 
+    public void renderZones(Canvas canvas){
+        if(!zones.isEmpty()){
+            for(Obstacle zone : zones){
+                //Log.d("Obstacle", "Zone Type:" + obstacle.getObstacleType());
+                if(actors.get(0).pointIsIntersecting(new PointF(actors.get(0).getHitBox().centerX(), actors.get(0).getHitBox().centerY()), zone.getHitBox())){
+                    Log.d("Obstacle", "Player is inside of " + zone.getObstacleType());
+                    if(zone.getObstacleType() == Obstacle.ObstacleType.END_ZONE && !winFlag){
+                        winFlag = true;
+                    }
+                }
+                zone.draw(canvas);
+            }
+        }
+    }
+
     /**
      * Render all actors stored in the actors ArrayList
      * @param canvas - The canvas to draw the actors on :Canvas
@@ -188,6 +202,13 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     actors.get(i).translate(-main.getAccelX() * actors.get(i).getAccelerometerScaleX(), main.getAccelY() * actors.get(i).getAccelerometerScaleY());
 
                     //only check against those that didn't TODO:Needs to change (if we have time).  Nested loops = Bad For Performance
+                    //collision for actors, only check for collision with all other actors
+                    for(int j=0; j<actors.size(); j++){
+                        if(i != j && actors.get(i).isIntersecting(actors.get(j))){
+                            collision = true;
+                            actors.set(i,slideCollision(actors.get(i),actors.get(j).getHitBox(),oldX,oldY));
+                        }
+                    }
                     for(RectF wall:walls){
                         if(actors.get(i).isIntersecting(wall)){
                             collision=true;
@@ -206,18 +227,6 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     }
                 }
                 actors.get(i).draw(canvas); //Draw the actor on the canvas
-            }
-        }
-        if(!zones.isEmpty()){
-            for(Obstacle zone : zones){
-                //Log.d("Obstacle", "Zone Type:" + obstacle.getObstacleType());
-                if(actors.get(0).isIntersecting(zone.getHitBox())){
-                    Log.d("Obstacle", "Player is inside of " + zone.getObstacleType());
-                    if(zone.getObstacleType() == Obstacle.ObstacleType.END_ZONE && !winFlag){
-                        winFlag = true;
-                    }
-                }
-                zone.draw(canvas);
             }
         }
         if(!constantObstacles.isEmpty()){
@@ -251,10 +260,10 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         if(!winFlag){
             time = (int) ((SystemClock.elapsedRealtime() - chronometer.getBase()) / 1000);
         }
-        canvas.drawText("Par Time:" + PAR_TIME, 15, 35, text);
+        canvas.drawText("Par Time:" + gameLevel.PAR_TIME, 15, 35, text);
         canvas.drawText("Time: " + time, 15, 35 + text.getTextSize(), text);
         if(winFlag){
-            score = (score < 0 ? (PAR_TIME - time > 0 ? PAR_TIME - time : 0): score);
+            score = (score < 0 ? (gameLevel.PAR_TIME - time > 0 ? gameLevel.PAR_TIME - time : 0): score);
             Paint textCentered = text;
             textCentered.setTextAlign(Paint.Align.CENTER);
             canvas.drawText("Level Clear", PX_WIDTH /2, PX_HEIGHT /2,textCentered);
