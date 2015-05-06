@@ -192,7 +192,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
         if(!actors.isEmpty()){
             //("Coordinates", "(x,y)=(" + actors.get(0).getHitBox().left + "," + actors.get(0).getHitBox().top+")");
             for(int i=0;i<actors.size();i++){ //Iterate through all actors
-                if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
+                if(Math.abs(actors.get(i).getAccelerometerScaleX()) > actors.get(i).MIN_ACCEL_SCALE || Math.abs(actors.get(i).getAccelerometerScaleY()) > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
                     float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();
                     float oldY = main.getAccelY()*actors.get(i).getAccelerometerScaleY();
 
