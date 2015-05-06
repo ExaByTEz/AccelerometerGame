@@ -221,12 +221,11 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                 constant.draw(canvas);
             }
         }
-        if(!walls.isEmpty()){//sanity check to be removed, simply highlights all regions so we can see their bounding boxes
+        if(!walls.isEmpty()){
             for(RectF condensedWalls:walls){
-                Paint testing=new Paint();//draw a green bounding box where the path/region should exist
+                Paint testing=new Paint();
                 testing.setColor(Color.BLACK);
                 testing.setStrokeWidth(2);
-                //testing.setAlpha(25);
                 canvas.drawRect(condensedWalls, testing);
             }
         }
