@@ -113,6 +113,67 @@ public class Level {
                 constantObstacles.add(new Obstacle(wallBitmap, spawn(player.getWidth()*3, view.PX_HEIGHT*0.7f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
                 constantObstacles.add(new Obstacle(wallBitmap, spawn((view.PX_WIDTH-2*(player.getWidth()*3)), view.PX_HEIGHT*0.7f), true, view.BITMAP_SCALE, Obstacle.ObstacleType.NONE));
                 break;
+            case 3:
+                Bitmap largeWallBitmap = Bitmap.createScaledBitmap(wallBitmap,wallBitmap.getWidth()*3,wallBitmap.getHeight(),false);
+                PAR_TIME = 15;
+                zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.start_zone), spawn(150, 150), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
+                zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.finish_zone), spawn(view.PX_WIDTH-250, view.PX_HEIGHT-150), false, view.BITMAP_SCALE, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
+
+                actors.add(new Actor(playerBitmap, spawn(zones.get(0).getX(),zones.get(0).getY()), 1, 1, true, view.BITMAP_SCALE)); //Index 0: Player
+                player = actors.get(0);
+
+                //top and bottom of screen
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(0,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(0,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                //left and right side screen
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(0,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(0,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH,0),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH,view.PX_HEIGHT),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                //rest of level
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.2f,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.2f,view.PX_HEIGHT*.4f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.2f,view.PX_HEIGHT*.6f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.2f,view.PX_HEIGHT*.8f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(0,view.PX_HEIGHT*.7f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.2f,view.PX_HEIGHT*.7f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*.4f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*.4f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.4f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.4f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.6f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.2f,view.PX_HEIGHT*.6f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.6f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.8f,view.PX_HEIGHT*.2f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.8f,view.PX_HEIGHT*.7f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.8f,view.PX_HEIGHT*.7f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.7f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                actors.add(new Actor(largeWallBitmap,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*0.5f),0.3f,0.0f,true,view.BITMAP_SCALE));
+
+                actors.add(new Actor(largeWallBitmap,spawn(view.PX_WIDTH*.6f,view.PX_HEIGHT*0.6f),(-0.3f),0.0f,true,view.BITMAP_SCALE));
+
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.7f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmapVert,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.8f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH*.4f,view.PX_HEIGHT*.8f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                constantObstacles.add(new Obstacle(wallBitmap,spawn(view.PX_WIDTH,view.PX_HEIGHT*.8f),true, view.BITMAP_SCALE,Obstacle.ObstacleType.NONE));
+                break;
             case 4:
                 PAR_TIME = 60;
 
