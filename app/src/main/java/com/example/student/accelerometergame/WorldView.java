@@ -195,7 +195,6 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                 if(actors.get(i).getAccelerometerScaleX() > actors.get(i).MIN_ACCEL_SCALE || actors.get(i).getAccelerometerScaleY() > actors.get(i).MIN_ACCEL_SCALE){ //Move the actor if it uses the accelerometer
                     float oldX = -main.getAccelX()*actors.get(i).getAccelerometerScaleX();
                     float oldY = main.getAccelY()*actors.get(i).getAccelerometerScaleY();
-                    boolean collision = false;
 
                     //we need to translate first. this ensure the next movement is tested instead of the current, allowing oldX and oldY to properly move the object back in time, instead of moving it a new direction
                     //the old way created the bug allowing you to tilt the accelerometer before draw allowing the ball to phase through solids
@@ -205,24 +204,12 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
                     //collision for actors, only check for collision with all other actors
                     for(int j=0; j<actors.size(); j++){
                         if(i != j && actors.get(i).isIntersecting(actors.get(j))){
-                            collision = true;
                             actors.set(i,slideCollision(actors.get(i),actors.get(j).getHitBox(),oldX,oldY));
                         }
                     }
                     for(RectF wall:walls){
                         if(actors.get(i).isIntersecting(wall)){
-                            collision=true;
                             actors.set(i,slideCollision(actors.get(i),wall,oldX,oldY));
-                        }
-                    }
-                    if(!collision) {
-                        for (int j = i + 1; j < actors.size(); j++) {
-                            if (actors.get(i).isIntersecting(actors.get(j))) {
-                                //actors.get(i).translate(-oldX,-oldY);//for now, just stop them
-                                //collision = true;
-                                Log.d("Collision", "Collision Successful with Actor");
-                                actors.set(i, slideCollision(actors.get(i), actors.get(j).getHitBox(), oldX, oldY));
-                            }
                         }
                     }
                 }
