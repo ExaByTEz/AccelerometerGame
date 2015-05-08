@@ -68,7 +68,7 @@ public class Level {
             case 2:
                 PAR_TIME = 15;
                 zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.start_zone), spawn(view.PX_WIDTH*0.1f, view.PX_HEIGHT*0.1f), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
-                zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.finish_zone), spawn(view.PX_WIDTH*0.75f, view.PX_HEIGHT*0.8f), false, view.BITMAP_SCALE, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
+                zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.finish_zone), spawn(view.PX_WIDTH*0.75f, view.PX_HEIGHT*0.35f), false, view.BITMAP_SCALE, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
 
                 actors.add(new Actor(playerBitmap, spawn(zones.get(0).getX(),zones.get(0).getY()), 1, 1, true, view.BITMAP_SCALE)); //Index 0: Player
                 player = actors.get(0);
