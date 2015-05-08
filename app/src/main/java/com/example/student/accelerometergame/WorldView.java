@@ -52,17 +52,17 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
 
         winFlag = false; //TODO: We may need to move a lot of these into separate initialization methods, the WorldView constructor is getting too big
 
-        Log.d("Display", "density="+getResources().getDisplayMetrics().density);
+        //Log.d("Display", "density="+getResources().getDisplayMetrics().density);
         this.BITMAP_SCALE = 1/getResources().getDisplayMetrics().density;
-        Log.d("Display", "BITMAP_SCALE="+this.BITMAP_SCALE);
+        //Log.d("Display", "BITMAP_SCALE="+this.BITMAP_SCALE);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         display.getMetrics(displayMetrics);
         PX_WIDTH = displayMetrics.widthPixels;
         PX_HEIGHT = displayMetrics.heightPixels-50;
         densityDpi = displayMetrics.densityDpi;
-        Log.d("Display", "densityDpi="+densityDpi);
-        Log.d("Display", "width="+ PX_WIDTH);
-        Log.d("Display", "height="+ PX_HEIGHT);
+        //Log.d("Display", "densityDpi="+densityDpi);
+        //Log.d("Display", "width="+ PX_WIDTH);
+        //Log.d("Display", "height="+ PX_HEIGHT);
         //Initialize ArrayList of actors
         actors = new ArrayList<>();
         zones = new ArrayList<>();
@@ -174,7 +174,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
             for(Obstacle zone : zones){
                 //Log.d("Obstacle", "Zone Type:" + obstacle.getObstacleType());
                 if(actors.get(0).pointIsIntersecting(new PointF(actors.get(0).getHitBox().centerX(), actors.get(0).getHitBox().centerY()), zone.getHitBox())){
-                    Log.d("Obstacle", "Player is inside of " + zone.getObstacleType());
+                    //Log.d("Obstacle", "Player is inside of " + zone.getObstacleType());
                     if(zone.getObstacleType() == Obstacle.ObstacleType.END_ZONE && !winFlag){
                         winFlag = true;
                     }
@@ -260,7 +260,7 @@ public class WorldView extends SurfaceView implements SurfaceHolder.Callback{
     }
 
     private void endLevel(){
-        Log.d("zones", "won level");
+        //Log.d("zones", "won level");
         changeThreadState(false);
         //"Restart" the game to the next level when the screen is touched
         this.setOnTouchListener(new OnTouchListener() {

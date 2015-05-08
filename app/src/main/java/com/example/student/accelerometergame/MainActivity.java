@@ -74,8 +74,8 @@ public class MainActivity extends Activity implements SensorEventListener {
                 game.removeAllViews();
                 worldView = new WorldView(gameLevel, v.getContext(), (MainActivity)v.getContext(), getWindowManager().getDefaultDisplay());
                 addViewsToGame();
-                Log.d("button","restart btn clicked");
-                Log.d("button","Game time:"+ SystemClock.elapsedRealtime());
+                //Log.d("button","restart btn clicked");
+                //Log.d("button","Game time:"+ SystemClock.elapsedRealtime());
             }
         });
 
@@ -89,7 +89,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                     gameText.setVisibility(View.VISIBLE);
 
                     //worldView.pauseThread();
-                    Log.d("button", "pause button pressed");
+                    //Log.d("button", "pause button pressed");
                 }
             }
         });
@@ -102,7 +102,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                     worldView.changeThreadState(true);
                     gameText.setVisibility(View.GONE);
                     worldView.setVisibility(View.VISIBLE);
-                    Log.d("button", "resume button pressed");
+                    //Log.d("button", "resume button pressed");
                 }
             }
         });
