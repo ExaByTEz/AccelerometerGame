@@ -32,7 +32,7 @@ public class Level {
 
         switch(levelId){
             case 1:
-                PAR_TIME = 10;
+                PAR_TIME = 15;
                 zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.start_zone), spawn(view.PX_WIDTH*0.1f, view.PX_HEIGHT*0.1f), false, view.BITMAP_SCALE, Obstacle.ObstacleType.START_ZONE)); //Index 0: Start Zone
                 zones.add(new Obstacle(BitmapFactory.decodeResource(view.getResources(), R.drawable.finish_zone), spawn(view.PX_WIDTH*0.9f, view.PX_HEIGHT*0.9f), false, view.BITMAP_SCALE, Obstacle.ObstacleType.END_ZONE)); //Index 1: End Zone
 
